@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="icon" type="image/png" href='xiaohui.png'>
+<title>班级墙 - 谢家湾学校2020级7班 · 毕业记忆</title>
+<style>
+  *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;user-select:none;-webkit-user-select:none}
+  img{-webkit-user-drag:none;user-drag:none}
+  body{
+    font-family:"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif;
+    background:#050810;color:#e0e6f0;overflow-x:hidden;min-height:100vh;
+  }
+  .bg-fixed{position:fixed;inset:0;z-index:-2;background:url('starbg.jpg') center/cover no-repeat;filter:brightness(0.25) saturate(1.2)}
+  .bg-overlay{position:fixed;inset:0;z-index:-1;background:linear-gradient(180deg,rgba(5,8,16,0.75) 0%,rgba(5,8,16,0.92) 100%)}
+
+  .navbar{
+    position:fixed;top:0;left:0;right:0;z-index:100;
+    display:flex;align-items:center;justify-content:space-between;
+    padding:10px 24px;
+    background:rgba(10,14,28,0.8);backdrop-filter:blur(20px);
+    border-bottom:1px solid rgba(255,255,255,0.08);
+  }
+  .nav-brand{display:flex;align-items:center;gap:12px;cursor:pointer}
+  .nav-logo{width:38px;height:38px;border-radius:50%;object-fit:cover;border:2px solid rgba(255,255,255,0.2)}
+  .nav-brand-text{display:flex;flex-direction:column;line-height:1.3}
+  .nav-brand-title{font-size:14px;font-weight:700;color:#e8efff}
+  .nav-brand-sub{font-size:10px;color:#7a8ab5;letter-spacing:1.5px}
+  .nav-back{
+    padding:8px 18px;border-radius:10px;
+    background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);
+    color:#c8d4f0;font-size:13px;cursor:pointer;transition:all .25s;
+  }
+  .nav-back:hover{background:rgba(91,168,255,0.15);border-color:rgba(91,168,255,0.3);color:#fff}
+
+  .container{padding:100px 24px 60px;max-width:1400px;margin:0 auto}
+  .page-header{text-align:center;margin-bottom:50px}
+  .page-tag{
+    display:inline-block;padding:4px 14px;border-radius:14px;
+    background:rgba(91,168,255,0.1);border:1px solid rgba(91,168,255,0.2);
+    font-size:11px;color:#7bc0ff;letter-spacing:2px;margin-bottom:14px;
+  }
+  .page-title{
+    font-size:clamp(28px,5vw,48px);font-weight:800;letter-spacing:4px;
+    background:linear-gradient(135deg,#fff,#7bc0ff,#a07bff);
+    -webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;
+    margin-bottom:12px;
+  }
+  .page-desc{font-size:15px;color:#7a8ab5;max-width:600px;margin:0 auto;line-height:1.8}
+
+  .gallery{
+    display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));
+    gap:12px;
+  }
+  .gallery-item{
+    position:relative;border-radius:12px;overflow:hidden;
+    aspect-ratio:4/3;cursor:pointer;
+    border:1px solid rgba(255,255,255,0.06);
+    transition:all .35s cubic-bezier(.22,1,.36,1);
+    background:rgba(20,24,44,0.5);
+  }
+  .gallery-item:hover{
+    transform:translateY(-4px) scale(1.02);
+    box-shadow:0 12px 36px rgba(0,0,0,0.4),0 0 24px rgba(91,168,255,0.1);
+    border-color:rgba(91,168,255,0.3);
+    z-index:2;
+  }
+  .gallery-item img{width:100%;height:100%;object-fit:cover;transition:transform .5s}
+  .gallery-item:hover img{transform:scale(1.08)}
+  .gallery-item .num{
+    position:absolute;top:8px;left:8px;
+    width:26px;height:26px;border-radius:8px;
+    background:rgba(0,0,0,0.5);backdrop-filter:blur(8px);
+    display:flex;align-items:center;justify-content:center;
+    font-size:11px;font-weight:700;color:#fff;
+  }
+  .gallery-item .overlay{
+    position:absolute;inset:0;
+    background:linear-gradient(180deg,transparent 50%,rgba(5,8,16,0.8) 100%);
+    opacity:0;transition:opacity .3s;display:flex;align-items:flex-end;padding:12px;
+  }
+  .gallery-item:hover .overlay{opacity:1}
+  .gallery-item .caption{color:#e8efff;font-size:12px;font-weight:500}
+
+  /* Lightbox */
+  .lightbox{
+    position:fixed;inset:0;z-index:1000;
+    background:rgba(0,0,0,0.92);backdrop-filter:blur(10px);
+    display:none;align-items:center;justify-content:center;
+    animation:fadeIn .3s;
+  }
+  .lightbox.show{display:flex}
+  @keyframes fadeIn{from{opacity:0}to{opacity:1}}
+  .lightbox-img{
+    max-width:90vw;max-height:85vh;object-fit:contain;
+    border-radius:12px;box-shadow:0 20px 60px rgba(0,0,0,0.5);
+    animation:zoomIn .35s cubic-bezier(.22,1,.36,1);
+  }
+  @keyframes zoomIn{from{opacity:0;transform:scale(.9)}to{opacity:1;transform:scale(1)}}
+  .lightbox-close{
+    position:absolute;top:20px;right:24px;
+    width:44px;height:44px;border-radius:50%;
+    background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.2);
+    color:#fff;font-size:22px;cursor:pointer;
+    display:flex;align-items:center;justify-content:center;
+    transition:all .25s;
+  }
+  .lightbox-close:hover{background:rgba(255,80,80,0.3);border-color:rgba(255,80,80,0.5);transform:rotate(90deg)}
+  .lightbox-download{
+    position:absolute;top:20px;right:80px;
+    width:44px;height:44px;border-radius:50%;
+    background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.2);
+    color:#fff;font-size:18px;cursor:pointer;
+    display:flex;align-items:center;justify-content:center;
+    transition:all .25s;
+  }
+  .lightbox-download:hover{background:rgba(74,222,128,0.3);border-color:rgba(74,222,128,0.5);transform:scale(1.1)}
+  .lightbox-nav{
+    position:absolute;top:50%;transform:translateY(-50%);
+    width:50px;height:50px;border-radius:50%;
+    background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.15);
+    color:#fff;font-size:24px;cursor:pointer;
+    display:flex;align-items:center;justify-content:center;
+    transition:all .25s;
+  }
+  .lightbox-nav:hover{background:rgba(91,168,255,0.2);border-color:rgba(91,168,255,0.4)}
+  .lightbox-prev{left:24px}
+  .lightbox-next{right:24px}
+  .lightbox-counter{
+    position:absolute;bottom:24px;left:50%;transform:translateX(-50%);
+    color:#9aa8d0;font-size:14px;letter-spacing:1px;
+  }
+
+  .footer{
+    margin-top:50px;text-align:center;font-size:13px;color:#5a6890;line-height:2;
+  }
+  .footer b{color:#7a8ab5}
+
+  @media(max-width:600px){
+    .gallery{grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:8px}
+    .navbar{padding:10px 16px}
+    .nav-brand-title{font-size:12px}
+    .container{padding:90px 16px 40px}
+    .lightbox-nav{width:40px;height:40px;font-size:18px}
+    .lightbox-prev{left:12px}
+    .lightbox-next{right:12px}
+  }
+</style>
+<script src="bgm.js"></script>
+<script src="auth-check.js"></script>
+</head>
+<body>
+
+<div class="bg-fixed"></div>
+<div class="bg-overlay"></div>
+
+<nav class="navbar">
+  <div class="nav-brand" onclick="goBack()">
+    <img src='xiaohui.png' class="nav-logo" alt="校徽">
+    <div class="nav-brand-text">
+      <span class="nav-brand-title">谢家湾学校 2020级7班</span>
+      <span class="nav-brand-sub">毕业记忆</span>
+    </div>
+  </div>
+  <div style="display:flex;align-items:center;gap:12px;">
+    <div id="navUser" style="display:flex;align-items:center;gap:8px;">
+      <div id="navAvatar" style="width:30px;height:30px;border-radius:50%;background:linear-gradient(135deg,#3b82f6,#a07bff);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:#fff;">?</div>
+      <span id="navUsername" style="font-size:12px;color:#c8d4f0;">未登录</span>
+    </div>
+    <div class="nav-back" onclick="goBack()">← 返回</div>
+  </div>
+</nav>
+
+<div class="container">
+  <div class="page-header">
+    <span class="page-tag">CLASS WALL</span>
+    <h1 class="page-title">班级墙</h1>
+    <p class="page-desc">二年级入队纪念 · 2021年10月13日<br>42个珍贵瞬间，记录我们的成长足迹</p>
+  </div>
+
+  <div class="gallery" id="gallery"></div>
+
+  <div class="footer">
+    <b>聚是烈火，散为辰星 · 七班七班，所向披靡</b><br>
+    <span style="color:#4a5880;font-size:11px">© 2026 Class 7, Grade 2020. All rights reserved.</span>
+  </div>
+</div>
+
+<!-- Lightbox -->
+<div class="lightbox" id="lightbox" onclick="closeLightbox(event)">
+  <div class="lightbox-close" onclick="closeLightbox()">✕</div>
+  <div class="lightbox-download" onclick="downloadCurrentImage(event)" title="下载图片">📥</div>
+  <div class="lightbox-nav lightbox-prev" onclick="navLightbox(-1,event)">‹</div>
+  <img src="" class="lightbox-img" id="lightboxImg" alt="">
+  <div class="lightbox-nav lightbox-next" onclick="navLightbox(1,event)">›</div>
+  <div class="lightbox-counter" id="lightboxCounter"></div>
+</div>
+
+<script>
+var images = [
+  'IMG_20211013_133950.jpg','IMG_20211013_134031.jpg','IMG_20211013_134050.jpg',
+  'IMG_20211013_134100.jpg','IMG_20211013_134115.jpg','IMG_20211013_134141.jpg',
+  'IMG_20211013_134244.jpg','IMG_20211013_134256.jpg','IMG_20211013_134305.jpg',
+  'IMG_20211013_134330.jpg','IMG_20211013_134348.jpg','IMG_20211013_134415.jpg',
+  'IMG_20211013_134442.jpg','IMG_20211013_134455.jpg','IMG_20211013_134512.jpg',
+  'IMG_20211013_134554.jpg','IMG_20211013_134602.jpg','IMG_20211013_134726.jpg',
+  'IMG_20211013_134746.jpg','IMG_20211013_134755.jpg','IMG_20211013_134808.jpg',
+  'IMG_20211013_140536.jpg','IMG_20211013_140544.jpg','IMG_20211013_140701.jpg',
+  'IMG_20211013_140711.jpg','IMG_20211013_140726.jpg','IMG_20211013_140752.jpg',
+  'IMG_20211013_140809.jpg','IMG_20211013_140907.jpg','IMG_20211013_140950.jpg',
+  'IMG_20211013_141101.jpg','IMG_20211013_141120.jpg','IMG_20211013_141154.jpg',
+  'IMG_20211013_141205.jpg','IMG_20211013_141247.jpg','IMG_20211013_141323.jpg',
+  'IMG_20211013_141402.jpg','IMG_20211013_141422.jpg','IMG_20211013_163306.jpg',
+  'IMG_20211013_163322.jpg','IMG_20211013_163503.jpg','IMG_20211013_163933.jpg'
+];
+
+var gallery = document.getElementById('gallery');
+images.forEach(function(fname, idx){
+  var div = document.createElement('div');
+  div.className = 'gallery-item';
+  div.onclick = function(){openLightbox(idx)};
+  div.innerHTML =
+    '<div class="num">' + (idx+1) + '</div>' +
+    '<img src='rudui/' + fname + '" alt="入队照片' + (idx+1) + '" loading="lazy">' +
+    '<div class="overlay"><span class="caption">入队纪念 · 第' + (idx+1) + '张</span></div>';
+  gallery.appendChild(div);
+});
+
+var currentIdx = 0;
+function openLightbox(idx){
+  currentIdx = idx;
+  document.getElementById('lightboxImg').src = 'rudui/' + images[idx];
+  document.getElementById('lightboxCounter').textContent = (idx+1) + ' / ' + images.length;
+  document.getElementById('lightbox').classList.add('show');
+  document.body.style.overflow = 'hidden';
+}
+function closeLightbox(e){
+  if(e && e.target !== document.getElementById('lightbox') && !e.target.classList.contains('lightbox-close')) return;
+  document.getElementById('lightbox').classList.remove('show');
+  document.body.style.overflow = '';
+}
+function navLightbox(dir, e){
+  e.stopPropagation();
+  currentIdx = (currentIdx + dir + images.length) % images.length;
+  document.getElementById('lightboxImg').src = 'rudui/' + images[currentIdx];
+  document.getElementById('lightboxCounter').textContent = (currentIdx+1) + ' / ' + images.length;
+}
+
+/* 下载当前图片 */
+function downloadCurrentImage(e){
+  if(e) e.stopPropagation();
+  var imgSrc = 'rudui/' + images[currentIdx];
+  var link = document.createElement('a');
+  link.href = imgSrc;
+  link.download = images[currentIdx];
+  link.target = '_blank';
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+}
+
+document.addEventListener('keydown', function(e){
+  if(!document.getElementById('lightbox').classList.contains('show')) return;
+  if(e.key === 'Escape') closeLightbox();
+  if(e.key === 'ArrowLeft') navLightbox(-1, e);
+  if(e.key === 'ArrowRight') navLightbox(1, e);
+});
+</script>
+<script>
+/* 返回：根据模式跳转 */
+function goBack(){
+  if(sessionStorage.getItem('mode') === 'visitor'){
+    location.href = 'https://cqxjw-class7-2020-2.pages.dev/visitor.html';
+  }else{
+    location.href = 'https://cqxjw-class7-2020-2.pages.dev/a3x7k2m9p4q8r3t6w1y5u0i2o4.html';
+  }
+}
+/* 显示当前账号状态 */
+(function(){
+  try{
+    var sess = JSON.parse(localStorage.getItem('sb_session')||'null');
+    var adm = JSON.parse(localStorage.getItem('sb_admin')||'null');
+    var user = sess || adm;
+    if(user && user.name){
+      document.getElementById('navUsername').textContent = user.name;
+      document.getElementById('navAvatar').textContent = user.name.charAt(0);
+    }else if(sessionStorage.getItem('mode') === 'visitor'){
+      document.getElementById('navUsername').textContent = '访客';
+      document.getElementById('navAvatar').textContent = '访';
+      document.getElementById('navAvatar').style.background = 'linear-gradient(135deg,#6b7280,#9ca3af)';
+    }
+  }catch(e){}
+})();
+
+/* 防直达检测：必须有登录标记+session，或访客验证标记 */
+(function(){
+  var ok = false;
+  var hasSession = localStorage.getItem('sb_session') || localStorage.getItem('sb_admin');
+  if(sessionStorage.getItem('logged_in') && hasSession) ok = true;
+  else if(localStorage.getItem('logged_in') && hasSession){
+    var exp = parseInt(localStorage.getItem('login_expire')||'0');
+    if(Date.now() < exp){ ok = true; sessionStorage.setItem('logged_in','1'); }
+    else{ localStorage.removeItem('logged_in'); localStorage.removeItem('login_expire'); localStorage.removeItem('sb_session'); localStorage.removeItem('sb_admin'); }
+  }
+  if(sessionStorage.getItem('visitor_verified')) ok = true;
+  if(!ok) location.href = 'https://cqxjw-class7-2020.pages.dev/login.html';
+})();
+</script>
+</body>
+</html>
+
+
+

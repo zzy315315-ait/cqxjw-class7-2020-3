@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="icon" type="image/png" href="xiaohui.png">
+<title>毕业视频 - 谢家湾学校2020级7班 · 毕业记忆</title>
+<style>
+  *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;user-select:none;-webkit-user-select:none}
+  img{-webkit-user-drag:none;user-drag:none}
+  body{font-family:"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif;background:#050810;color:#e0e6f0;min-height:100vh}
+  .bg-fixed{position:fixed;inset:0;z-index:-2;background:url('starbg.jpg') center/cover no-repeat;filter:brightness(0.25) saturate(1.2)}
+  .bg-overlay{position:fixed;inset:0;z-index:-1;background:linear-gradient(180deg,rgba(5,8,16,0.75),rgba(5,8,16,0.92))}
+  .navbar{position:fixed;top:0;left:0;right:0;z-index:100;display:flex;align-items:center;justify-content:space-between;padding:10px 24px;background:rgba(10,14,28,0.8);backdrop-filter:blur(20px);border-bottom:1px solid rgba(255,255,255,0.08)}
+  .nav-brand{display:flex;align-items:center;gap:12px;cursor:pointer}
+  .nav-logo{width:38px;height:38px;border-radius:50%;object-fit:cover;border:2px solid rgba(255,255,255,0.2)}
+  .nav-brand-title{font-size:14px;font-weight:700;color:#e8efff}
+  .nav-brand-sub{font-size:10px;color:#7a8ab5;letter-spacing:1.5px}
+  .nav-back{padding:8px 18px;border-radius:10px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);color:#c8d4f0;font-size:13px;cursor:pointer;transition:all .25s}
+  .nav-back:hover{background:rgba(91,168,255,0.15);border-color:rgba(91,168,255,0.3);color:#fff}
+  .container{padding:100px 24px 60px;max-width:1200px;margin:0 auto}
+  .page-header{text-align:center;margin-bottom:40px}
+  .page-tag{display:inline-block;padding:4px 14px;border-radius:14px;background:rgba(91,168,255,0.1);border:1px solid rgba(91,168,255,0.2);font-size:11px;color:#7bc0ff;letter-spacing:2px;margin-bottom:14px}
+  .page-title{font-size:clamp(28px,5vw,42px);font-weight:800;letter-spacing:3px;background:linear-gradient(135deg,#fff,#7bc0ff,#a07bff);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:12px}
+  .page-desc{font-size:15px;color:#7a8ab5;max-width:600px;margin:0 auto;line-height:1.8}
+  .video-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:24px;margin-top:40px}
+  .video-card{background:rgba(20,24,44,0.6);backdrop-filter:blur(16px);border:1px solid rgba(255,255,255,0.08);border-radius:16px;overflow:hidden;transition:all .35s}
+  .video-card:hover{transform:translateY(-4px);border-color:rgba(91,168,255,0.3);box-shadow:0 16px 40px rgba(0,0,0,0.3)}
+  .video-player{width:100%;aspect-ratio:16/9;background:#000;display:block}
+  .video-info{padding:18px 20px}
+  .video-title{font-size:16px;font-weight:700;color:#e8efff;margin-bottom:6px;display:flex;justify-content:space-between;align-items:center}
+  .video-desc{font-size:13px;color:#8a98c0;line-height:1.6}
+  .video-badge{display:inline-block;padding:2px 8px;border-radius:6px;font-size:10px;letter-spacing:1px;margin-bottom:8px}
+  .badge-main{background:rgba(255,200,80,0.15);border:1px solid rgba(255,200,80,0.3);color:#ffc850}
+  .badge-teacher{background:rgba(123,192,255,0.1);border:1px solid rgba(123,192,255,0.25);color:#7bc0ff}
+  .badge-activity{background:rgba(160,123,255,0.1);border:1px solid rgba(160,123,255,0.25);color:#a07bff}
+  .download-btn{display:inline-flex;align-items:center;gap:4px;padding:4px 10px;border-radius:8px;background:rgba(91,168,255,0.1);border:1px solid rgba(91,168,255,0.25);color:#7bc0ff;font-size:11px;cursor:pointer;transition:all .25s;text-decoration:none}
+  .download-btn:hover{background:rgba(91,168,255,0.2);border-color:rgba(91,168,255,0.4);color:#fff}
+  .footer{margin-top:50px;text-align:center;font-size:13px;color:#5a6890;line-height:2}
+  .footer b{color:#7a8ab5}
+  @media(max-width:600px){.video-grid{grid-template-columns:1fr}.navbar{padding:10px 16px}.nav-brand-title{font-size:12px}.container{padding:90px 16px 40px}}
+</style>
+<script src="bgm.js"></script>
+<script src="auth-check.js"></script>
+
+<script>
+// Supabase配置
+var SUPABASE_URL = 'https://ekfntkpjqzmkibdimtru.supabase.co';
+var ANON_KEY = 'sb_publishable_Z3wpxD9ZRbXm9-gPPQOGZg_KKhr_yIs';
+</script>
+</head>
+<body>
+<div class="bg-fixed"></div><div class="bg-overlay"></div>
+<nav class="navbar">
+  <div class="nav-brand" onclick="goBack()">
+    <img src="xiaohui.png" class="nav-logo" alt="校徽">
+    <div><div class="nav-brand-title">谢家湾学校 2020级7班</div><div class="nav-brand-sub">毕业记忆</div></div>
+  </div>
+  <div style="display:flex;align-items:center;gap:12px;">
+    <div id="navUser" style="display:flex;align-items:center;gap:8px;">
+      <div id="navAvatar" style="width:30px;height:30px;border-radius:50%;background:linear-gradient(135deg,#3b82f6,#a07bff);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:#fff;">?</div>
+      <span id="navUsername" style="font-size:12px;color:#c8d4f0;">未登录</span>
+    </div>
+    <div class="nav-back" onclick="goBack()">← 返回</div>
+  </div>
+</nav>
+<div class="container">
+  <div class="page-header">
+    <span class="page-tag">VIDEOS</span>
+    <h1 class="page-title">毕业视频</h1>
+    <p class="page-desc">光影记录成长，声音承载回忆。<br>每一段视频都是我们共同的时光胶囊。</p>
+  </div>
+  <div class="video-grid" id="videoGrid">
+    <div class="video-card">
+      <video class="video-player" controls preload="metadata" poster="xiaohui.png">
+        <source src="https://ekfntkpjqzmkibdimtru.supabase.co/storage/v1/object/public/videos/6.7毕业视频.mp4" type="video/mp4">
+      </video>
+      <div class="video-info">
+        <span class="video-badge badge-main">★ 主推</span>
+        <div class="video-title">6.7毕业视频 <a class="download-btn" href="javascript:void(0)" onclick="downloadVideo('https://ekfntkpjqzmkibdimtru.supabase.co/storage/v1/object/public/videos/6.7毕业视频.mp4', '6.7毕业视频')">⬇ 下载</a></div>
+        <div class="video-desc">我们的六年，浓缩在这一段视频里。</div>
+      </div>
+    </div>
+    <div class="video-card">
+      <video class="video-player" controls preload="metadata" poster="xiaohui.png">
+        <source src="https://ekfntkpjqzmkibdimtru.supabase.co/storage/v1/object/public/videos/VID_449.mp4" type="video/mp4">
+      </video>
+      <div class="video-info">
+        <span class="video-badge badge-teacher">老师寄语</span>
+        <div class="video-title">邓老师寄语 <a class="download-btn" href="javascript:void(0)" onclick="downloadVideo('https://ekfntkpjqzmkibdimtru.supabase.co/storage/v1/object/public/videos/VID_449.mp4', '邓老师寄语')">⬇ 下载</a></div>
+        <div class="video-desc">邓老师对我们的毕业寄语与祝福。</div>
+      </div>
+    </div>
+    <div class="video-card">
+      <video class="video-player" controls preload="metadata" poster="xiaohui.png">
+        <source src="https://ekfntkpjqzmkibdimtru.supabase.co/storage/v1/object/public/videos/自编操混剪视频.mp4" type="video/mp4">
+      </video>
+      <div class="video-info">
+        <span class="video-badge badge-activity">活动</span>
+        <div class="video-title">自编操混剪 <a class="download-btn" href="javascript:void(0)" onclick="downloadVideo('https://ekfntkpjqzmkibdimtru.supabase.co/storage/v1/object/public/videos/自编操混剪视频.mp4', '自编操混剪')">⬇ 下载</a></div>
+        <div class="video-desc">我们的自编操比赛精彩瞬间混剪。</div>
+      </div>
+    </div>
+    <div class="video-card">
+      <video class="video-player" controls preload="metadata" poster="xiaohui.png">
+        <source src="https://ekfntkpjqzmkibdimtru.supabase.co/storage/v1/object/public/videos/countdown-10s.mp4" type="video/mp4">
+      </video>
+      <div class="video-info">
+        <span class="video-badge badge-activity">活动</span>
+        <div class="video-title">十秒倒计时 <a class="download-btn" href="javascript:void(0)" onclick="downloadVideo('https://ekfntkpjqzmkibdimtru.supabase.co/storage/v1/object/public/videos/countdown-10s.mp4', '十秒倒计时')">⬇ 下载</a></div>
+        <div class="video-desc">毕业联欢会开场倒计时。</div>
+      </div>
+    </div>
+  </div>
+  <div class="footer"><b>聚是烈火，散为辰星 · 七班七班，所向披靡</b><br><span style="color:#4a5880;font-size:11px">© 2026 Class 7, Grade 2020</span></div>
+</div>
+<script>
+/* 返回：根据用户身份跳转 */
+function goBack(){
+  // 管理员返回管理员主页
+  if(localStorage.getItem('sb_admin') || sessionStorage.getItem('sb_admin')){
+    location.href = 'https://cqxjw-class7-2020-2.pages.dev/admin-main.html';
+  }
+  // 访客返回访客主页
+  else if(sessionStorage.getItem('mode') === 'visitor' || sessionStorage.getItem('visitor_verified')){
+    location.href = 'https://cqxjw-class7-2020-2.pages.dev/visitor.html';
+  }
+  // 普通用户返回用户主页
+  else{
+    location.href = 'https://cqxjw-class7-2020-2.pages.dev/a3x7k2m9p4q8r3t6w1y5u0i2o4.html';
+  }
+}
+
+/* 视频下载限制功能（集成数据库） */
+function getCurrentUserInfo(){
+  var sess = JSON.parse(localStorage.getItem('sb_session') || sessionStorage.getItem('sb_session') || 'null');
+  if(sess && sess.uid){
+    return { type: 'user', uid: sess.uid, name: sess.name || '用户' };
+  }
+  var visitorId = localStorage.getItem('visitor_download_id');
+  if(!visitorId){
+    visitorId = 'visitor_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+    localStorage.setItem('visitor_download_id', visitorId);
+  }
+  return { type: 'visitor', uid: null, visitor_id: visitorId, name: '访客' };
+}
+
+// 从数据库查询是否已经下载过
+function checkDownloadedFromDB(videoName, callback){
+  var userInfo = getCurrentUserInfo();
+  var queryUrl = SUPABASE_URL + '/rest/v1/video_downloads?select=*&video_name=eq.' + encodeURIComponent(videoName);
+  
+  if(userInfo.type === 'user'){
+    queryUrl += '&user_id=eq.' + userInfo.uid;
+  } else {
+    queryUrl += '&visitor_id=eq.' + userInfo.visitor_id;
+  }
+  
+  fetch(queryUrl, {
+    method: 'GET',
+    headers: {
+      'apikey': ANON_KEY,
+      'Authorization': 'Bearer ' + ANON_KEY,
+      'Content-Type': 'application/json'
+    }
+  })
+  .then(function(res){ return res.json(); })
+  .then(function(data){
+    callback(data && data.length > 0);
+  })
+  .catch(function(err){
+    console.error('查询下载记录失败:', err);
+    // 查询失败时，用localStorage作为后备
+    var downloads = JSON.parse(localStorage.getItem('video_downloads') || '{}');
+    var key = userInfo.type === 'user' ? 'user_' + userInfo.uid : userInfo.visitor_id;
+    callback(downloads[key] && downloads[key][videoName]);
+  });
+}
+
+// 记录下载到数据库
+function recordDownloadToDB(videoName, url){
+  var userInfo = getCurrentUserInfo();
+  var body = {
+    video_name: videoName,
+    video_url: url,
+    visitor_id: userInfo.type === 'visitor' ? userInfo.visitor_id : null
+  };
+  
+  if(userInfo.type === 'user'){
+    body.user_id = userInfo.uid;
+  }
+  
+  fetch(SUPABASE_URL + '/rest/v1/video_downloads', {
+    method: 'POST',
+    headers: {
+      'apikey': ANON_KEY,
+      'Authorization': 'Bearer ' + ANON_KEY,
+      'Content-Type': 'application/json',
+      'Prefer': 'return=minimal'
+    },
+    body: JSON.stringify(body)
+  })
+  .then(function(){
+    console.log('下载记录已保存到数据库');
+  })
+  .catch(function(err){
+    console.error('保存下载记录失败:', err);
+  });
+  
+  // 同时保存到localStorage作为后备
+  var downloads = JSON.parse(localStorage.getItem('video_downloads') || '{}');
+  var key = userInfo.type === 'user' ? 'user_' + userInfo.uid : userInfo.visitor_id;
+  if(!downloads[key]) downloads[key] = {};
+  downloads[key][videoName] = {
+    time: new Date().toISOString(),
+    timestamp: Date.now()
+  };
+  localStorage.setItem('video_downloads', JSON.stringify(downloads));
+}
+
+function downloadVideo(url, videoName){
+  // 先从数据库查询是否已经下载过
+  checkDownloadedFromDB(videoName, function(hasDownloaded){
+    if(hasDownloaded){
+      alert('您已经下载过《' + videoName + '》了，每个账户只能下载一次。\n\n如果下载失败或需要重新下载，请联系管理员。');
+      return;
+    }
+    
+    var confirmed = confirm(
+      '【下载确认】\n\n' +
+      '您即将下载：《' + videoName + '》\n\n' +
+      '注意事项：\n' +
+      '1. 每个账户只能下载一次（包括下载中断）\n' +
+      '2. 下载过程中请勿关闭页面\n' +
+      '3. 下载后请妥善保存文件\n\n' +
+      '确定要开始下载吗？'
+    );
+    
+    if(!confirmed) return;
+    
+    // 记录下载到数据库
+    recordDownloadToDB(videoName, url);
+    
+    // 开始下载
+    var a = document.createElement('a');
+    a.href = url;
+    a.download = url.split('/').pop();
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    
+    setTimeout(function(){
+      alert('下载已开始！\n\n《' + videoName + '》正在下载中，请耐心等待。\n\n注意：每个账户只能下载一次，请确保下载完成。');
+    }, 500);
+  });
+}
+
+/* 视频互斥播放：播放一个时暂停其他所有，同时暂停背景音乐 */
+(function(){
+  var videos = document.querySelectorAll('.video-player');
+  var bgmWasPlaying = false;
+  
+  videos.forEach(function(v){
+    v.addEventListener('play', function(){
+      // 暂停其他所有视频
+      videos.forEach(function(other){
+        if(other !== v) other.pause();
+      });
+      // 暂停背景音乐
+      if(window.BGM && BGM.isPlaying && BGM.isPlaying()){
+        bgmWasPlaying = true;
+        BGM.pause();
+      }
+    });
+    v.addEventListener('pause', function(){
+      // 检查是否所有视频都暂停了
+      var anyPlaying = false;
+      videos.forEach(function(other){
+        if(!other.paused) anyPlaying = true;
+      });
+      // 如果所有视频都暂停了，恢复背景音乐
+      if(!anyPlaying && bgmWasPlaying && window.BGM){
+        BGM.play();
+        bgmWasPlaying = false;
+      }
+    });
+    v.addEventListener('ended', function(){
+      // 视频结束，恢复背景音乐
+      if(bgmWasPlaying && window.BGM){
+        BGM.play();
+        bgmWasPlaying = false;
+      }
+    });
+  });
+})();
+
+/* 显示当前账号状态（同时检查localStorage和sessionStorage） */
+(function(){
+  try{
+    var sess = JSON.parse(localStorage.getItem('sb_session') || sessionStorage.getItem('sb_session') || 'null');
+    var adm = JSON.parse(localStorage.getItem('sb_admin') || sessionStorage.getItem('sb_admin') || 'null');
+    var user = sess || adm;
+    if(user && user.name){
+      document.getElementById('navUsername').textContent = user.name;
+      document.getElementById('navAvatar').textContent = user.name.charAt(0);
+    }else if(sessionStorage.getItem('mode') === 'visitor' || sessionStorage.getItem('visitor_verified')){
+      document.getElementById('navUsername').textContent = '访客';
+      document.getElementById('navAvatar').textContent = '访';
+      document.getElementById('navAvatar').style.background = 'linear-gradient(135deg,#6b7280,#9ca3af)';
+    }else{
+      // 未登录，跳转到登录页
+      window.location.href = 'https://cqxjw-class7-2020.pages.dev/login.html';
+    }
+  }catch(e){
+    window.location.href = 'https://cqxjw-class7-2020.pages.dev/login.html';
+  }
+})();
+
+/* 防直达检测：必须有登录标记+session，或访客验证标记，或管理员session */
+(function(){
+  var ok = false;
+  var hasSession = localStorage.getItem('sb_session') || localStorage.getItem('sb_admin') || sessionStorage.getItem('sb_session') || sessionStorage.getItem('sb_admin');
+  if(sessionStorage.getItem('logged_in') && hasSession) ok = true;
+  else if(localStorage.getItem('logged_in') && hasSession){
+    var exp = parseInt(localStorage.getItem('login_expire')||'0');
+    if(Date.now() < exp){ ok = true; sessionStorage.setItem('logged_in','1'); }
+    else{ localStorage.removeItem('logged_in'); localStorage.removeItem('login_expire'); localStorage.removeItem('sb_session'); localStorage.removeItem('sb_admin'); }
+  }
+  if(sessionStorage.getItem('visitor_verified')) ok = true;
+  // 管理员session也算已登录
+  if(localStorage.getItem('sb_admin') || sessionStorage.getItem('sb_admin')) ok = true;
+  if(!ok) location.href = 'https://cqxjw-class7-2020.pages.dev/login.html';
+})();
+</script>
+</body>
+</html>
+
+
+

@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="icon" type="image/png" href='xiaohui.png'>
+<title>班级相册 - 谢家湾学校2020级7班 · 毕业记忆</title>
+<style>
+  *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;user-select:none;-webkit-user-select:none}
+  img{-webkit-user-drag:none;user-drag:none}
+  body{font-family:"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif;background:#050810;color:#e0e6f0;min-height:100vh}
+  .bg-fixed{position:fixed;inset:0;z-index:-2;background:url('starbg.jpg') center/cover no-repeat;filter:brightness(0.25) saturate(1.2)}
+  .bg-overlay{position:fixed;inset:0;z-index:-1;background:linear-gradient(180deg,rgba(5,8,16,0.75),rgba(5,8,16,0.92))}
+  .navbar{position:fixed;top:0;left:0;right:0;z-index:100;display:flex;align-items:center;justify-content:space-between;padding:10px 24px;background:rgba(10,14,28,0.8);backdrop-filter:blur(20px);border-bottom:1px solid rgba(255,255,255,0.08)}
+  .nav-brand{display:flex;align-items:center;gap:12px;cursor:pointer}
+  .nav-logo{width:38px;height:38px;border-radius:50%;object-fit:cover;border:2px solid rgba(255,255,255,0.2)}
+  .nav-brand-title{font-size:14px;font-weight:700;color:#e8efff}
+  .nav-brand-sub{font-size:10px;color:#7a8ab5;letter-spacing:1.5px}
+  .nav-back{padding:8px 18px;border-radius:10px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);color:#c8d4f0;font-size:13px;cursor:pointer;transition:all .25s}
+  .nav-back:hover{background:rgba(91,168,255,0.15);border-color:rgba(91,168,255,0.3);color:#fff}
+  .container{padding:100px 24px 60px;max-width:1400px;margin:0 auto}
+  .page-header{text-align:center;margin-bottom:40px}
+  .page-tag{display:inline-block;padding:4px 14px;border-radius:14px;background:rgba(91,168,255,0.1);border:1px solid rgba(91,168,255,0.2);font-size:11px;color:#7bc0ff;letter-spacing:2px;margin-bottom:14px}
+  .page-title{font-size:clamp(28px,5vw,42px);font-weight:800;letter-spacing:3px;background:linear-gradient(135deg,#fff,#7bc0ff,#a07bff);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:12px}
+  .page-desc{font-size:15px;color:#7a8ab5;max-width:600px;margin:0 auto;line-height:1.8}
+  .gallery{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:14px;margin-top:40px}
+  .gallery-item{position:relative;border-radius:12px;overflow:hidden;aspect-ratio:4/3;cursor:pointer;border:1px solid rgba(255,255,255,0.06);transition:all .35s;background:rgba(20,24,44,0.5)}
+  .gallery-item:hover{transform:translateY(-4px) scale(1.02);box-shadow:0 12px 36px rgba(0,0,0,0.4),0 0 24px rgba(91,168,255,0.1);border-color:rgba(91,168,255,0.3);z-index:2}
+  .gallery-item img{width:100%;height:100%;object-fit:cover;transition:transform .5s}
+  .gallery-item:hover img{transform:scale(1.08)}
+  .gallery-item .caption{position:absolute;bottom:0;left:0;right:0;padding:12px;background:linear-gradient(180deg,transparent,rgba(5,8,16,0.85));color:#e8efff;font-size:13px;font-weight:500}
+  .footer{margin-top:50px;text-align:center;font-size:13px;color:#5a6890;line-height:2}
+  .footer b{color:#7a8ab5}
+  
+  /* 图片查看器 */
+  .img-viewer{position:fixed;inset:0;background:rgba(5,8,16,0.95);z-index:1000;display:none;align-items:center;justify-content:center;animation:fadeIn .3s}
+  .img-viewer.show{display:flex}
+  .img-viewer-img{max-width:90%;max-height:85%;object-fit:contain;border-radius:12px;box-shadow:0 20px 60px rgba(0,0,0,0.5)}
+  .img-viewer-close{position:absolute;top:20px;right:24px;width:44px;height:44px;border-radius:50%;background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.2);color:#fff;font-size:22px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .25s}
+  .img-viewer-close:hover{background:rgba(255,80,80,0.3);border-color:rgba(255,80,80,0.5);transform:rotate(90deg)}
+  .img-viewer-download{position:absolute;top:20px;right:80px;width:44px;height:44px;border-radius:50%;background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.2);color:#fff;font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .25s}
+  .img-viewer-download:hover{background:rgba(74,222,128,0.3);border-color:rgba(74,222,128,0.5);transform:scale(1.1)}
+  .img-viewer-nav{position:absolute;top:50%;transform:translateY(-50%);width:50px;height:50px;border-radius:50%;background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.15);color:#fff;font-size:24px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .25s}
+  .img-viewer-nav:hover{background:rgba(91,168,255,0.2);border-color:rgba(91,168,255,0.4)}
+  .img-viewer-prev{left:24px}
+  .img-viewer-next{right:24px}
+  .img-viewer-caption{position:absolute;bottom:24px;left:50%;transform:translateX(-50%);color:#e8efff;font-size:16px;font-weight:500;text-align:center;max-width:80%}
+  @keyframes fadeIn{from{opacity:0}to{opacity:1}}
+  
+  @media(max-width:600px){.gallery{grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:8px}.navbar{padding:10px 16px}.nav-brand-title{font-size:12px}.container{padding:90px 16px 40px}}
+</style>
+<script src="bgm.js"></script>
+<script src="auth-check.js"></script>
+</head>
+<body>
+<div class="bg-fixed"></div><div class="bg-overlay"></div>
+<nav class="navbar">
+  <div class="nav-brand" onclick="goBack()">
+    <img src='xiaohui.png' class="nav-logo" alt="校徽">
+    <div><div class="nav-brand-title">谢家湾学校 2020级7班</div><div class="nav-brand-sub">毕业记忆</div></div>
+  </div>
+  <div style="display:flex;align-items:center;gap:12px;">
+    <div id="navUser" style="display:flex;align-items:center;gap:8px;">
+      <div id="navAvatar" style="width:30px;height:30px;border-radius:50%;background:linear-gradient(135deg,#3b82f6,#a07bff);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:#fff;">?</div>
+      <span id="navUsername" style="font-size:12px;color:#c8d4f0;">未登录</span>
+    </div>
+    <div class="nav-back" onclick="goBack()">← 返回</div>
+  </div>
+</nav>
+<div class="container">
+  <div class="page-header">
+    <span class="page-tag">GALLERY</span>
+    <h1 class="page-title">班级相册</h1>
+    <p class="page-desc">每一张照片都是一段回忆，记录着我们一起走过的日子。</p>
+  </div>
+  <div class="gallery" id="gallery"></div>
+  <div class="footer"><b>聚是烈火，散为辰星 · 七班七班，所向披靡</b><br><span style="color:#4a5880;font-size:11px">© 2026 Class 7, Grade 2020</span></div>
+</div>
+
+<!-- 图片查看器 -->
+<div class="img-viewer" id="imgViewer" onclick="closeImgViewer(event)">
+  <div class="img-viewer-close" onclick="closeImgViewer(event)">✕</div>
+  <div class="img-viewer-download" onclick="downloadCurrentImg(event)" title="下载图片">📥</div>
+  <div class="img-viewer-nav img-viewer-prev" onclick="navImgViewer(-1,event)">‹</div>
+  <img src="" class="img-viewer-img" id="imgViewerImg" alt="">
+  <div class="img-viewer-nav img-viewer-next" onclick="navImgViewer(1,event)">›</div>
+  <div class="img-viewer-caption" id="imgViewerCaption"></div>
+</div>
+<script>
+var images = [
+  {src:'ppt_images/slide3_img2.jpg', caption:'入学合照'},
+  {src:'ppt_images/slide4_img3.jpg', caption:'校园时光'},
+  {src:'ppt_images/slide5_img4.jpg', caption:'班级活动'},
+  {src:'ppt_images/slide6_img5.jpg', caption:'新年照片'},
+  {src:'ppt_images/slide7_img6.png', caption:'运动会'},
+  {src:'photos/photo1.jpg', caption:'班级照片1'},
+  {src:'photos/photo2.jpg', caption:'班级照片2'},
+  {src:'photos/photo3.jpg', caption:'班级照片3'},
+  {src:'photos/photo4.jpg', caption:'班级照片4'},
+  {src:'photos/photo5.jpg', caption:'班级照片5'},
+  {src:'photos/photo6.jpg', caption:'班级照片6'},
+  {src:'photos/hezao1.jpg', caption:'合照'},
+  {src:'photos/hezao2.jpg', caption:'合照2'}
+];
+var gallery = document.getElementById('gallery');
+var currentImgIdx = 0;
+images.forEach(function(item, idx){
+  var div = document.createElement('div');
+  div.className = 'gallery-item';
+  div.onclick = function(){ openImgViewer(idx); };
+  div.innerHTML = '<img src="'+item.src+'" alt="'+item.caption+'" loading="lazy" onerror="this.parentElement.style.display=\'none\'"><div class="caption">'+item.caption+'</div>';
+  gallery.appendChild(div);
+});
+
+/* 图片查看器 */
+function openImgViewer(idx){
+  currentImgIdx = idx;
+  var viewer = document.getElementById('imgViewer');
+  var img = document.getElementById('imgViewerImg');
+  var caption = document.getElementById('imgViewerCaption');
+  img.src = images[idx].src;
+  caption.textContent = images[idx].caption;
+  viewer.classList.add('show');
+  document.body.style.overflow = 'hidden';
+}
+function closeImgViewer(e){
+  if(e && e.target !== document.getElementById('imgViewer') && !e.target.classList.contains('img-viewer-close')) return;
+  document.getElementById('imgViewer').classList.remove('show');
+  document.body.style.overflow = '';
+}
+function navImgViewer(dir, e){
+  e.stopPropagation();
+  currentImgIdx = (currentImgIdx + dir + images.length) % images.length;
+  document.getElementById('imgViewerImg').src = images[currentImgIdx].src;
+  document.getElementById('imgViewerCaption').textContent = images[currentImgIdx].caption;
+}
+function downloadCurrentImg(e){
+  e.stopPropagation();
+  var src = images[currentImgIdx].src;
+  var filename = src.substring(src.lastIndexOf('/') + 1);
+  var link = document.createElement('a');
+  link.href = src;
+  link.download = filename;
+  link.target = '_blank';
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+}
+document.addEventListener('keydown', function(e){
+  if(!document.getElementById('imgViewer').classList.contains('show')) return;
+  if(e.key === 'Escape') closeImgViewer();
+  if(e.key === 'ArrowLeft') navImgViewer(-1, e);
+  if(e.key === 'ArrowRight') navImgViewer(1, e);
+});
+</script>
+<script>
+/* 公开页面：允许登录用户、访客和管理员访问 */
+function goBack(){
+  // 管理员返回管理员主页
+  if(localStorage.getItem('sb_admin') || sessionStorage.getItem('sb_admin')){
+    location.href = 'https://cqxjw-class7-2020-2.pages.dev/admin-main.html';
+  }
+  // 访客返回访客主页
+  else if(sessionStorage.getItem('mode') === 'visitor' || sessionStorage.getItem('visitor_verified')){
+    location.href = 'https://cqxjw-class7-2020-2.pages.dev/visitor.html';
+  }
+  // 普通用户返回用户主页
+  else{
+    location.href = 'https://cqxjw-class7-2020-2.pages.dev/a3x7k2m9p4q8r3t6w1y5u0i2o4.html';
+  }
+}
+/* 显示当前账号状态 */
+(function(){
+  try{
+    var sess = JSON.parse(localStorage.getItem('sb_session')||'null');
+    var adm = JSON.parse(localStorage.getItem('sb_admin')||'null');
+    var user = sess || adm;
+    if(user && user.name){
+      document.getElementById('navUsername').textContent = user.name;
+      document.getElementById('navAvatar').textContent = user.name.charAt(0);
+    }else if(sessionStorage.getItem('mode') === 'visitor'){
+      document.getElementById('navUsername').textContent = '访客';
+      document.getElementById('navAvatar').textContent = '访';
+      document.getElementById('navAvatar').style.background = 'linear-gradient(135deg,#6b7280,#9ca3af)';
+    }
+  }catch(e){}
+})();
+
+/* 防直达检测：必须有登录标记+session，或访客验证标记，或管理员session */
+(function(){
+  var ok = false;
+  var hasSession = localStorage.getItem('sb_session') || localStorage.getItem('sb_admin') || sessionStorage.getItem('sb_session') || sessionStorage.getItem('sb_admin');
+  if(sessionStorage.getItem('logged_in') && hasSession) ok = true;
+  else if(localStorage.getItem('logged_in') && hasSession){
+    var exp = parseInt(localStorage.getItem('login_expire')||'0');
+    if(Date.now() < exp){ ok = true; sessionStorage.setItem('logged_in','1'); }
+    else{ localStorage.removeItem('logged_in'); localStorage.removeItem('login_expire'); localStorage.removeItem('sb_session'); localStorage.removeItem('sb_admin'); }
+  }
+  if(sessionStorage.getItem('visitor_verified')) ok = true;
+  // 管理员session也算已登录
+  if(localStorage.getItem('sb_admin') || sessionStorage.getItem('sb_admin')) ok = true;
+  if(!ok) location.href = 'https://cqxjw-class7-2020.pages.dev/login.html';
+})();
+</script>
+</body>
+</html>
+
+
+

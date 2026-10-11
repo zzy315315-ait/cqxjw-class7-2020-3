@@ -1,0 +1,865 @@
+﻿<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="icon" type="image/png" href="xiaohui.png">
+<title>留言墙 - 谢家湾学校2020级7班 · 毕业记忆</title>
+<link rel="stylesheet" href="common.css">
+<script src="config.js"></script>
+<script src="common.js"></script>
+<style>
+  *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;user-select:none;-webkit-user-select:none}
+  input,textarea{user-select:text;-webkit-user-select:text}
+  img{-webkit-user-drag:none;user-drag:none}
+  body{font-family:"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif;background:#050810;color:#e0e6f0;min-height:100vh}
+  .bg-fixed{position:fixed;inset:0;z-index:-2;background:url('starbg.jpg') center/cover no-repeat;filter:brightness(0.28) saturate(1.2)}
+  .bg-overlay{position:fixed;inset:0;z-index:-1;background:linear-gradient(180deg,rgba(5,8,16,0.75),rgba(5,8,16,0.94))}
+  .navbar{position:fixed;top:0;left:0;right:0;z-index:100;display:flex;align-items:center;justify-content:space-between;padding:10px 24px;background:rgba(10,14,28,0.85);backdrop-filter:blur(20px);border-bottom:1px solid rgba(255,255,255,0.08)}
+  .nav-brand{display:flex;align-items:center;gap:12px;cursor:pointer}
+  .nav-logo{width:38px;height:38px;border-radius:50%;object-fit:cover;border:2px solid rgba(255,255,255,0.2)}
+  .nav-brand-title{font-size:14px;font-weight:700;color:#e8efff}
+  .nav-brand-sub{font-size:10px;color:#7a8ab5;letter-spacing:1.5px}
+  .nav-back{padding:8px 18px;border-radius:10px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);color:#c8d4f0;font-size:13px;cursor:pointer;transition:all .25s}
+  .nav-back:hover{background:rgba(91,168,255,0.15);border-color:rgba(91,168,255,0.3);color:#fff}
+  .container{padding:100px 24px 60px;max-width:800px;margin:0 auto}
+  .page-header{text-align:center;margin-bottom:30px}
+  .page-tag{display:inline-block;padding:4px 14px;border-radius:14px;background:rgba(91,168,255,0.1);border:1px solid rgba(91,168,255,0.2);font-size:11px;color:#7bc0ff;letter-spacing:2px;margin-bottom:14px}
+  .page-title{font-size:clamp(24px,4vw,36px);font-weight:800;letter-spacing:3px;background:linear-gradient(135deg,#fff,#7bc0ff);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:8px}
+  .page-desc{font-size:14px;color:#7a8ab5}
+
+  /* 发布表单 */
+  .post-form{background:rgba(20,24,44,0.65);backdrop-filter:blur(16px);border:1px solid rgba(255,255,255,0.08);border-radius:16px;padding:24px;margin-bottom:30px}
+  .form-row{display:flex;gap:12px;margin-bottom:12px}
+  .form-input{flex:1;padding:10px 14px;border-radius:10px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);color:#e8efff;font-size:14px;outline:none;transition:all .25s}
+  .form-input:focus{border-color:rgba(91,168,255,0.4);background:rgba(255,255,255,0.08)}
+  .form-input::placeholder{color:#5a6890}
+  .form-textarea{width:100%;padding:12px 14px;border-radius:10px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);color:#e8efff;font-size:14px;outline:none;transition:all .25s;resize:vertical;min-height:80px;font-family:inherit}
+  .form-textarea:focus{border-color:rgba(91,168,255,0.4);background:rgba(255,255,255,0.08)}
+  .form-textarea::placeholder{color:#5a6890}
+  .form-bottom{display:flex;justify-content:space-between;align-items:center;margin-top:12px}
+  .form-hint{font-size:12px;color:#5a6890}
+  .submit-btn{padding:10px 28px;border-radius:10px;border:none;cursor:pointer;background:linear-gradient(135deg,#4a90ff,#6b5bff);color:#fff;font-size:14px;font-weight:600;letter-spacing:1px;transition:all .25s;box-shadow:0 4px 16px rgba(74,144,255,0.3)}
+  .submit-btn:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(74,144,255,0.5)}
+  .submit-btn:active{transform:scale(.97)}
+  .submit-btn:disabled{opacity:.5;cursor:not-allowed;transform:none}
+  .admin-options{display:none;gap:10px;margin-bottom:12px;align-items:center}
+  .admin-options.show{display:flex}
+  .admin-options label{font-size:13px;color:#9aa8d0;display:flex;align-items:center;gap:6px;cursor:pointer}
+  .admin-options input[type="checkbox"]{accent-color:#ffc850;width:16px;height:16px}
+
+  /* 留言列表 */
+  .msg-list{display:flex;flex-direction:column;gap:14px}
+  .msg-item{background:rgba(20,24,44,0.55);backdrop-filter:blur(12px);border:1px solid rgba(255,255,255,0.06);border-radius:14px;padding:18px 20px;animation:msgIn .4s cubic-bezier(.22,1,.36,1) both;position:relative;transition:all .3s}
+  .msg-item:hover{border-color:rgba(91,168,255,0.2);background:rgba(20,24,44,0.7)}
+  .msg-item.pinned{border-color:rgba(255,200,80,0.3);background:rgba(40,35,20,0.5)}
+  .msg-item.pinned::before{content:'📌 置顶';position:absolute;top:-1px;right:16px;background:linear-gradient(135deg,#ffc850,#ff9500);color:#1a1a2e;font-size:10px;font-weight:700;padding:3px 10px;border-radius:0 0 8px 8px;letter-spacing:1px}
+  .msg-item.announcement{border-color:rgba(74,222,128,0.3);background:rgba(15,35,20,0.5)}
+  .msg-item.announcement::before{content:'📢 公告';position:absolute;top:-1px;right:16px;background:linear-gradient(135deg,#4ade80,#22c55e);color:#0a1a0e;font-size:10px;font-weight:700;padding:3px 10px;border-radius:0 0 8px 8px;letter-spacing:1px}
+  @keyframes msgIn{from{opacity:0;transform:translateY(15px) scale(.98)}to{opacity:1;transform:translateY(0) scale(1)}}
+  .msg-header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px}
+  .msg-name{font-size:15px;font-weight:700;color:#e8efff;display:flex;align-items:center;gap:8px}
+  .msg-role{font-size:10px;padding:2px 8px;border-radius:6px;font-weight:600;letter-spacing:.5px}
+  .role-admin{background:rgba(255,107,107,0.15);color:#f87171;border:1px solid rgba(255,107,107,0.25)}
+  .role-teacher{background:rgba(123,192,255,0.1);color:#7bc0ff;border:1px solid rgba(123,192,255,0.2)}
+  .role-dev{background:rgba(255,200,80,0.12);color:#ffc850;border:1px solid rgba(255,200,80,0.2)}
+  .msg-uid{font-size:11px;color:#5a6890;margin-left:4px}
+  .msg-time{font-size:11px;color:#5a6890;flex-shrink:0}
+  .msg-content{font-size:14px;color:#c8d4f0;line-height:1.7;word-break:break-word;white-space:pre-wrap}
+  .msg-delete{position:absolute;top:12px;right:12px;width:28px;height:28px;border-radius:8px;background:rgba(248,113,113,0.1);border:1px solid rgba(248,113,113,0.2);color:#f87171;font-size:14px;cursor:pointer;display:none;align-items:center;justify-content:center;transition:all .2s;opacity:0}
+  .msg-edit{position:absolute;top:12px;right:48px;width:28px;height:28px;border-radius:8px;background:rgba(91,168,255,0.1);border:1px solid rgba(91,168,255,0.2);color:#5ba8ff;font-size:14px;cursor:pointer;display:none;align-items:center;justify-content:center;transition:all .2s;opacity:0}
+  .msg-item:hover .msg-delete,.msg-item:hover .msg-edit{opacity:1}
+  .msg-delete:hover{background:rgba(248,113,113,0.25);transform:scale(1.1)}
+  .msg-edit:hover{background:rgba(91,168,255,0.25);transform:scale(1.1)}
+  .is-admin .msg-delete,.is-owner .msg-edit{display:flex}
+  .empty-state{text-align:center;padding:60px 20px;color:#5a6890}
+  .empty-state .icon{font-size:48px;margin-bottom:16px;opacity:.5}
+  .loading{text-align:center;padding:40px;color:#7a8ab5}
+  .loading .spinner{display:inline-block;width:24px;height:24px;border:2px solid rgba(91,168,255,0.2);border-top-color:#5ba8ff;border-radius:50%;animation:spin .8s linear infinite}
+  @keyframes spin{to{transform:rotate(360deg)}}
+
+  /* 弹窗 */
+  .toast{position:fixed;top:80px;left:50%;transform:translateX(-50%) translateY(-20px);padding:12px 24px;border-radius:10px;font-size:14px;font-weight:500;z-index:200;opacity:0;transition:all .3s;pointer-events:none;backdrop-filter:blur(12px)}
+  .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+  .toast.success{background:rgba(34,197,94,0.9);border:1px solid rgba(74,222,128,0.3);color:#fff}
+  .toast.error{background:rgba(239,68,68,0.9);border:1px solid rgba(248,113,113,0.3);color:#fff}
+  .toast.info{background:rgba(59,130,246,0.9);border:1px solid rgba(96,165,250,0.3);color:#fff}
+
+  .footer{margin-top:40px;text-align:center;font-size:13px;color:#5a6890;line-height:2}
+  .footer b{color:#7a8ab5}
+  @media(max-width:600px){.navbar{padding:10px 16px}.nav-brand-title{font-size:12px}.container{padding:90px 16px 40px}.form-row{flex-direction:column}}
+
+  /* ===== 流动留言墙模式（弹幕风格） ===== */
+  .floating-mode{position:fixed;inset:0;z-index:50;overflow:hidden;pointer-events:none}
+  .floating-msg{position:absolute;background:rgba(20,24,44,0.9);backdrop-filter:blur(16px);border:1px solid rgba(255,255,255,0.1);border-radius:14px;padding:10px 14px;pointer-events:auto;cursor:default;transition:box-shadow .3s, background .3s;line-height:1.4;white-space:nowrap;max-width:none}
+  .floating-msg:hover{box-shadow:0 12px 40px rgba(0,0,0,0.5);z-index:10;background:rgba(30,35,60,0.95)}
+  .floating-msg.pinned{border-color:rgba(255,200,80,0.4);background:rgba(40,35,20,0.9)}
+  .floating-msg.announcement{border-color:rgba(74,222,128,0.4);background:rgba(15,35,20,0.9)}
+  .floating-msg .f-name{font-size:12px;font-weight:700;color:#e8efff;margin-bottom:3px;display:block}
+  .floating-msg .f-content{font-size:13px;color:#c8d4f0;line-height:1.5;display:block}
+  .floating-msg .f-time{font-size:10px;color:#5a6890;margin-top:4px;display:block}
+  .floating-msg .f-role{font-size:9px;padding:1px 6px;border-radius:4px;font-weight:600;margin-left:6px}
+  
+  /* 从右往左滚动（弹幕风格） */
+  @keyframes danmuRightToLeft{
+    0%{transform:translateX(0)}
+    100%{transform:translateX(calc(-100vw - 400px))}
+  }
+  .floating-msg.danmu-rtl{animation:danmuRightToLeft linear forwards;will-change:transform}
+  
+  /* 从上往下滚动 */
+  @keyframes danmuTopToBottom{
+    0%{transform:translateY(0)}
+    100%{transform:translateY(calc(100vh + 300px))}
+  }
+  .floating-msg.danmu-ttb{animation:danmuTopToBottom linear forwards;will-change:transform}
+
+  /* 右下角发布按钮 */
+  .fab-post{position:fixed;bottom:30px;right:30px;width:60px;height:60px;border-radius:50%;background:linear-gradient(135deg,#4a90ff,#6b5bff);border:none;color:#fff;font-size:28px;cursor:pointer;z-index:200;box-shadow:0 8px 30px rgba(74,144,255,0.4);transition:all .3s;display:flex;align-items:center;justify-content:center}
+  .fab-post:hover{transform:scale(1.1) rotate(90deg);box-shadow:0 12px 40px rgba(74,144,255,0.6)}
+  .fab-post:active{transform:scale(.95)}
+
+  /* 右上角管理员设置按钮 */
+  .admin-settings-btn{position:fixed;top:80px;right:20px;width:44px;height:44px;border-radius:12px;background:rgba(255,107,107,0.15);border:1px solid rgba(255,107,107,0.3);color:#f87171;font-size:18px;cursor:pointer;z-index:150;display:none;align-items:center;justify-content:center;transition:all .25s;backdrop-filter:blur(10px)}
+  .admin-settings-btn.show{display:flex}
+  .admin-settings-btn:hover{background:rgba(255,107,107,0.25);transform:scale(1.05)}
+
+  /* 发布弹窗 */
+  .post-modal{position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,0.7);backdrop-filter:blur(8px);display:none;align-items:center;justify-content:center;padding:20px}
+  .post-modal.show{display:flex}
+  .post-modal-content{background:linear-gradient(135deg,#1a1a2e,#16213e);border-radius:20px;padding:28px;max-width:480px;width:100%;border:1px solid rgba(255,255,255,0.1);box-shadow:0 20px 60px rgba(0,0,0,0.5);position:relative;animation:modalIn .3s ease-out}
+  @keyframes modalIn{from{opacity:0;transform:scale(.9) translateY(20px)}to{opacity:1;transform:scale(1) translateY(0)}}
+  .post-modal-close{position:absolute;top:16px;right:16px;width:32px;height:32px;border-radius:50%;background:rgba(255,255,255,0.05);border:none;color:#8892b0;font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .2s}
+  .post-modal-close:hover{background:rgba(255,255,255,0.1);color:#fff;transform:rotate(90deg)}
+  .post-modal-title{font-size:20px;font-weight:700;color:#fff;margin-bottom:20px;text-align:center}
+  .post-modal .form-input,.post-modal .form-textarea{width:100%;margin-bottom:12px}
+  .post-modal .submit-btn{width:100%;padding:14px}
+
+  /* 模式切换按钮 */
+  .mode-toggle{padding:8px 16px;border-radius:10px;background:rgba(91,168,255,0.1);border:1px solid rgba(91,168,255,0.2);color:#7bc0ff;font-size:12px;cursor:pointer;backdrop-filter:blur(10px);transition:all .25s;white-space:nowrap}
+  .mode-toggle:hover{background:rgba(91,168,255,0.2)}
+  
+  /* 顶部控制按钮组 */
+  .control-buttons{position:fixed;top:80px;left:20px;display:flex;flex-direction:column;gap:8px;z-index:150}
+  .ctrl-btn{padding:8px 14px;border-radius:10px;background:rgba(20,24,44,0.85);backdrop-filter:blur(12px);border:1px solid rgba(255,255,255,0.1);color:#e8efff;font-size:12px;font-weight:600;cursor:pointer;transition:all .25s;white-space:nowrap}
+  .ctrl-btn:hover{background:rgba(30,35,60,0.9);transform:translateX(3px);box-shadow:0 6px 20px rgba(0,0,0,0.3)}
+</style>
+<script src="config.js"></script>`r`n<script src="bgm.js"></script>`r`n<script src="auth-check.js"></script>
+</head>
+<body>
+<div class="bg-fixed"></div><div class="bg-overlay"></div>
+<nav class="navbar">
+  <div class="nav-brand" onclick="goBack()">
+    <img src="xiaohui.png" class="nav-logo" alt="校徽">
+    <div><div class="nav-brand-title">谢家湾学校 2020级7班</div><div class="nav-brand-sub">毕业记忆</div></div>
+  </div>
+  <div style="display:flex;align-items:center;gap:12px;">
+    <div id="navUser" style="display:flex;align-items:center;gap:8px;">
+      <div id="navAvatar" style="width:30px;height:30px;border-radius:50%;background:linear-gradient(135deg,#3b82f6,#a07bff);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:#fff;">?</div>
+      <span id="navUsername" style="font-size:12px;color:#c8d4f0;">未登录</span>
+    </div>
+    <div class="nav-back" onclick="goBack()">← 返回</div>
+  </div>
+</nav>
+
+<!-- 流动留言容器 -->
+<div class="floating-mode" id="floatingMode"></div>
+
+<!-- 顶部控制按钮组 -->
+<div class="control-buttons">
+  <button class="ctrl-btn" id="refreshBtn" onclick="refreshMessages()" title="刷新留言">🔄 刷新</button>
+  <button class="ctrl-btn" id="directionToggle" onclick="toggleDanmuDirection()" title="切换弹幕方向">⬇️ 从上往下</button>
+  <button class="mode-toggle" id="modeToggle" onclick="toggleMode()">📋 列表模式</button>
+</div>
+
+<!-- 右上角管理员设置按钮 -->
+<button class="admin-settings-btn" id="adminSettingsBtn" onclick="location.href='admin-settings.html'">⚙️</button>
+
+<!-- 右下角发布按钮 -->
+<button class="fab-post" id="fabPost" onclick="openPostModal()">+</button>
+
+<!-- 发布弹窗 -->
+<div class="post-modal" id="postModal" onclick="if(event.target===this)closePostModal()">
+  <div class="post-modal-content">
+    <button class="post-modal-close" onclick="closePostModal()">×</button>
+    <h3 class="post-modal-title">发布留言</h3>
+    <div class="admin-options" id="adminOptionsModal" style="display:none;gap:10px;margin-bottom:12px;align-items:center;">
+      <label style="font-size:13px;color:#9aa8d0;display:flex;align-items:center;gap:6px;cursor:pointer;"><input type="checkbox" id="isAnnouncementModal"> 设为公告（置顶）</label>
+    </div>
+    <input type="text" class="form-input" id="msgNameModal" placeholder="你的名字（可自定义昵称）" maxlength="20">
+    <textarea class="form-textarea" id="msgContentModal" placeholder="想说点什么？（最多500字）" maxlength="500" style="min-height:120px;"></textarea>
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
+      <span style="font-size:12px;color:#5a6890;" id="charCountModal">0 / 500</span>
+    </div>
+    <button class="submit-btn" onclick="postMessageModal()">发布留言</button>
+  </div>
+</div>
+
+<!-- 编辑弹窗 -->
+<div class="post-modal" id="editModal" onclick="if(event.target===this)closeEditModal()">
+  <div class="post-modal-content">
+    <button class="post-modal-close" onclick="closeEditModal()">×</button>
+    <h3 class="post-modal-title">编辑留言</h3>
+    <input type="hidden" id="editMsgId">
+    <textarea class="form-textarea" id="editContent" placeholder="修改你的留言..." maxlength="500" style="min-height:120px;"></textarea>
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
+      <span style="font-size:12px;color:#5a6890;" id="editCharCount">0 / 500</span>
+    </div>
+    <button class="submit-btn" onclick="saveEditMessage()">保存修改</button>
+  </div>
+</div>
+
+<div class="container">
+  <div class="page-header">
+    <span class="page-tag">MESSAGE BOARD</span>
+    <h1 class="page-title">留言墙</h1>
+    <p class="page-desc">留下你想说的话，记录我们的故事</p>
+  </div>
+
+  <!-- 发布表单 -->
+  <div class="post-form">
+    <div class="admin-options" id="adminOptions">
+      <label><input type="checkbox" id="isAnnouncement"> 设为公告（置顶）</label>
+    </div>
+    <div class="form-row">
+      <input type="text" class="form-input" id="msgName" placeholder="你的名字（可自定义昵称）" maxlength="20">
+    </div>
+    <textarea class="form-textarea" id="msgContent" placeholder="想说点什么？（最多500字）" maxlength="500"></textarea>
+    <div class="form-bottom">
+      <span class="form-hint" id="charCount">0 / 500</span>
+      <button class="submit-btn" id="submitBtn" onclick="postMessage()">发布留言</button>
+    </div>
+  </div>
+
+  <!-- 留言列表 -->
+  <div class="msg-list" id="msgList">
+    <div class="loading"><div class="spinner"></div><div style="margin-top:12px">加载中...</div></div>
+  </div>
+
+  <div class="footer"><b>聚是烈火，散为辰星 · 七班七班，所向披靡</b><br><span style="color:#4a5880;font-size:11px">© 2026 Class 7, Grade 2020</span></div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+/* ============================================================
+   留言墙 - Supabase REST API
+   ============================================================ */
+// 使用公共配置（config.js），以后改配置只需要改config.js
+var SUPABASE_URL = CONFIG.SUPABASE_URL;
+var ANON_KEY = CONFIG.ANON_KEY;
+var ADMIN_UIDS = CONFIG.ADMIN_UIDS;
+var SUPER_ADMIN_UID = ADMIN_UIDS[0]; // 第一个管理员是超级管理员
+
+// 开发者学号（3号陶柏彦、12号周子义、19号毛艺杰）
+var DEV_SIDS = CONFIG.DEV_SIDS;
+// 老师邮箱
+var TEACHER_EMAIL = CONFIG.TEACHER_EMAIL;
+
+var isAdmin = false;
+var currentUser = null;
+
+/* 显示当前账号状态 */
+(function(){
+  try{
+    // 同时检查localStorage和sessionStorage
+    var sess = JSON.parse(localStorage.getItem('sb_session') || sessionStorage.getItem('sb_session') || 'null');
+    var adm = JSON.parse(localStorage.getItem('sb_admin') || sessionStorage.getItem('sb_admin') || 'null');
+    var user = sess || adm;
+    if(user && user.name){
+      document.getElementById('navUsername').textContent = user.name;
+      document.getElementById('navAvatar').textContent = user.name.charAt(0);
+    }else if(sessionStorage.getItem('mode') === 'visitor' || sessionStorage.getItem('visitor_verified')){
+      document.getElementById('navUsername').textContent = '访客';
+      document.getElementById('navAvatar').textContent = '访';
+      document.getElementById('navAvatar').style.background = 'linear-gradient(135deg,#6b7280,#9ca3af)';
+    }else{
+      // 未登录，跳转到登录页
+      window.location.href = 'https://cqxjw-class7-2020.pages.dev/login.html';
+    }
+  }catch(e){
+    window.location.href = 'https://cqxjw-class7-2020.pages.dev/login.html';
+  }
+})();
+
+/* 防直达检测：留言墙允许登录用户和访客访问，但必须从登录页/访客页跳转过来 */
+(function(){
+  var ok = false;
+  var hasSession = localStorage.getItem('sb_session') || localStorage.getItem('sb_admin');
+  if(sessionStorage.getItem('logged_in') && hasSession) ok = true;
+  else if(localStorage.getItem('logged_in') && hasSession){
+    var exp = parseInt(localStorage.getItem('login_expire')||'0');
+    if(Date.now() < exp){ ok = true; sessionStorage.setItem('logged_in','1'); }
+    else{ localStorage.removeItem('logged_in'); localStorage.removeItem('login_expire'); localStorage.removeItem('sb_session'); localStorage.removeItem('sb_admin'); }
+  }
+  if(sessionStorage.getItem('visitor_verified')) ok = true;
+  if(!ok){ location.href = 'https://cqxjw-class7-2020.pages.dev/login.html'; return; }
+  try{
+    var sess = JSON.parse(localStorage.getItem('sb_session')||'null');
+    var adm = JSON.parse(localStorage.getItem('sb_admin')||'null');
+    currentUser = sess || adm;
+    if(currentUser){
+      document.getElementById('msgName').value = currentUser.name || '';
+      // 判断是否管理员（用UID白名单，不依赖role）
+      if(currentUser.uid && ADMIN_UIDS.indexOf(currentUser.uid.toLowerCase()) >= 0) isAdmin = true;
+      if(sessionStorage.getItem('is_admin') || localStorage.getItem('is_admin')) isAdmin = true;
+    }
+  }catch(e){}
+  if(isAdmin){
+    document.body.classList.add('is-admin');
+    document.getElementById('adminOptions').classList.add('show');
+    document.getElementById('adminOptionsModal').style.display = 'flex';
+    document.getElementById('adminSettingsBtn').classList.add('show');
+  }
+})();
+
+function goBack(){
+  if(sessionStorage.getItem('mode') === 'visitor'){
+    location.href = 'https://cqxjw-class7-2020-2.pages.dev/visitor.html';
+  }else if(isAdmin){
+    location.href = 'https://cqxjw-class7-2020-2.pages.dev/admin-main.html';
+  }else{
+    location.href = 'https://cqxjw-class7-2020-2.pages.dev/a3x7k2m9p4q8r3t6w1y5u0i2o4.html';
+  }
+}
+
+/* 字数统计 */
+document.getElementById('msgContent').addEventListener('input', function(){
+  document.getElementById('charCount').textContent = this.value.length + ' / 500';
+});
+
+/* Toast提示 */
+function showToast(msg, type){
+  var t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = 'toast ' + (type||'info');
+  setTimeout(function(){ t.classList.add('show'); }, 10);
+  setTimeout(function(){ t.classList.remove('show'); }, 2500);
+}
+
+/* 加载留言 */
+function loadMessages(){
+  var list = document.getElementById('msgList');
+  list.innerHTML = '<div class="loading"><div class="spinner"></div><div style="margin-top:12px">加载中...</div></div>';
+
+  fetch(SUPABASE_URL + "/rest/v1/messages?select=*&order=created_at.desc&limit=200", {
+    headers: { "apikey": ANON_KEY, "Authorization": "Bearer " + ANON_KEY }
+  })
+  .then(function(r){ return r.json(); })
+  .then(function(data){
+    if(!Array.isArray(data) || data.length === 0){
+      list.innerHTML = '<div class="empty-state"><div class="icon">💬</div><div>还没有留言，来抢沙发吧！</div></div>';
+      allMessages = [];
+      return;
+    }
+    allMessages = data;
+    renderMessages(data);
+    // 如果是流动模式，重新渲染流动留言
+    if(isFloatingMode) renderFloatingMessages();
+  })
+  .catch(function(err){
+    list.innerHTML = '<div class="empty-state"><div class="icon">⚠️</div><div>加载失败：' + escapeHtml(err.message) + '</div></div>';
+  });
+}
+
+/* 渲染留言 */
+function renderMessages(data){
+  var list = document.getElementById('msgList');
+  list.innerHTML = '';
+
+  // 分类：超级管理员 > 管理员 > 老师 > 公告 > 开发者 > 普通
+  var superAdmin = [];
+  var admin = [];
+  var teacher = [];
+  var announcement = [];
+  var dev = [];
+  var normal = [];
+  
+  data.forEach(function(msg){
+    var role = getRole(msg);
+    if(msg.uid && msg.uid.toLowerCase() === SUPER_ADMIN_UID.toLowerCase()){
+      superAdmin.push({msg:msg, role:'super_admin'});
+    }else if(role === 'admin'){
+      admin.push({msg:msg, role:role});
+    }else if(role === 'teacher'){
+      teacher.push({msg:msg, role:role});
+    }else if(role === 'announcement'){
+      announcement.push({msg:msg, role:role});
+    }else if(role === 'dev'){
+      dev.push({msg:msg, role:role});
+    }else{
+      normal.push({msg:msg, role:role});
+    }
+  });
+
+  // 按优先级排序：超级管理员 > 管理员 > 老师 > 公告 > 开发者 > 普通
+  var all = superAdmin.concat(admin, teacher, announcement, dev, normal);
+  all.forEach(function(item, idx){
+    var div = document.createElement('div');
+    div.className = 'msg-item';
+    if(item.role === 'announcement') div.classList.add('announcement');
+    else if(item.role !== 'normal') div.classList.add('pinned');
+
+    var time = formatTime(item.msg.created_at);
+    var roleTag = '';
+    if(item.role === 'admin') roleTag = '<span class="msg-role role-admin">管理员</span>';
+    else if(item.role === 'teacher') roleTag = '<span class="msg-role role-teacher">老师</span>';
+    else if(item.role === 'dev') roleTag = '<span class="msg-role role-dev">开发者</span>';
+
+    var uidTag = '';
+    if(item.msg.uid) uidTag = '<span class="msg-uid">#' + escapeHtml(item.msg.uid.substring(0,8)) + '</span>';
+    
+    // 显示名称：有学号显示"名字（学号）"格式
+    var name = escapeHtml(item.msg.name || '匿名');
+    if(item.msg.student_id && item.msg.student_id !== 'teacher'){
+      name = name + ' <span style="color:#5a6890;font-size:12px;font-weight:400;">(学号 ' + escapeHtml(item.msg.student_id) + ')</span>';
+    }
+    var content = escapeHtml(item.msg.content || '');
+    
+    // 只有管理员或留言所有者才能看到删除和编辑按钮
+    var isOwner = currentUser && item.msg.uid && currentUser.uid.toLowerCase() === item.msg.uid.toLowerCase();
+    var actionBtns = '';
+    if(isAdmin || isOwner){
+      actionBtns = '<div class="msg-delete" onclick="deleteMessage(' + item.msg.id + ', \'' + (item.msg.uid || '') + '\', this)" title="删除">✕</div>';
+    }
+    if(isOwner){
+      actionBtns += '<div class="msg-edit" onclick="editMessage(' + item.msg.id + ', \'' + escapeHtml(item.msg.content || '').replace(/'/g, "\\'") + '\', this)" title="编辑">✏️</div>';
+    }
+
+    div.innerHTML =
+      '<div class="msg-header">' +
+        '<div class="msg-name">' + name + roleTag + uidTag + '</div>' +
+        '<div class="msg-time">' + time + '</div>' +
+      '</div>' +
+      '<div class="msg-content">' + content + '</div>' +
+      actionBtns;
+
+    div.style.animationDelay = (idx * 0.03) + 's';
+    list.appendChild(div);
+  });
+}
+
+/* 判断角色 */
+function getRole(msg){
+  if(msg.is_announcement) return 'announcement';
+  if(msg.uid && ADMIN_UIDS.indexOf(msg.uid.toLowerCase()) >= 0) return 'admin';
+  if(msg.role === 'admin' || msg.role === 'super_admin') return 'admin';
+  if(msg.role === 'teacher' || msg.name === '邓老师') return 'teacher';
+  if(msg.student_id && DEV_SIDS.indexOf(msg.student_id) >= 0) return 'dev';
+  return 'normal';
+}
+
+/* 发布留言 */
+function postMessage(){
+  var name = document.getElementById('msgName').value.trim();
+  var content = document.getElementById('msgContent').value.trim();
+  var btn = document.getElementById('submitBtn');
+
+  if(!name){ showToast('请输入名字', 'error'); return; }
+  if(name.length > 30){ showToast('名字最多30个字符', 'error'); return; }
+  // 检测乱码：只允许中文、英文、数字、常见标点
+  var validNameRegex = /^[\u4e00-\u9fa5a-zA-Z0-9\s\-\_\.、，。！？！？]+$/;
+  if(!validNameRegex.test(name)){ showToast('名字包含非法字符，请使用中文、英文或数字', 'error'); return; }
+  if(!content){ showToast('请输入留言内容', 'error'); return; }
+
+  btn.disabled = true;
+  btn.textContent = '发布中...';
+
+  var body = { name: name, content: content };
+  // uid和role由数据库触发器自动填充，防止前端伪造身份
+  if(currentUser && currentUser.student_id){
+    body.student_id = currentUser.student_id;
+  }
+  if(isAdmin && document.getElementById('isAnnouncement').checked){
+    body.is_announcement = true;
+  }
+
+  // 登录用户用自己的token（后端触发器才能获取auth.uid()），匿名用户用anon key
+  var authToken = ANON_KEY;
+  if(currentUser && currentUser.token) authToken = currentUser.token;
+
+  fetch(SUPABASE_URL + "/rest/v1/messages", {
+    method: "POST",
+    headers: {
+      "apikey": ANON_KEY,
+      "Authorization": "Bearer " + authToken,
+      "Content-Type": "application/json",
+      "Prefer": "return=minimal"
+    },
+    body: JSON.stringify(body)
+  })
+  .then(function(r){
+    if(r.ok || r.status === 201 || r.status === 204 || r.status === 404){
+      // 404也可能是成功的（Supabase某些版本返回404但实际已创建）
+      if(r.status === 404){
+        console.warn('Supabase返回404，但留言可能已创建成功');
+      }
+      showToast('发布成功！', 'success');
+      document.getElementById('msgContent').value = '';
+      document.getElementById('charCount').textContent = '0 / 500';
+      document.getElementById('isAnnouncement').checked = false;
+      setTimeout(function(){ loadMessages(); }, 500);
+    }else if(r.status === 401){
+      // token过期，跳回登录页
+      showToast('登录已过期，请重新登录', 'error');
+      setTimeout(function(){ location.href = 'https://cqxjw-class7-2020.pages.dev/login.html'; }, 1500);
+    }else{
+      return r.text().then(function(e){ throw new Error(e || '发布失败'); });
+    }
+  })
+  .catch(function(err){
+    showToast('发布失败：' + err.message, 'error');
+  })
+  .finally(function(){
+    btn.disabled = false;
+    btn.textContent = '发布留言';
+  });
+}
+
+/* 删除留言 */
+function deleteMessage(id, msgUid, el){
+  // 管理员可以删除所有留言，普通用户只能删除自己的留言
+  var isOwner = false;
+  if(currentUser && currentUser.uid && msgUid){
+    // 不区分大小写比较UID
+    isOwner = currentUser.uid.toLowerCase() === msgUid.toLowerCase();
+  }
+  if(!isAdmin && !isOwner){ 
+    console.log('删除权限检查：isAdmin=' + isAdmin + ', isOwner=' + isOwner);
+    console.log('currentUser.uid=' + (currentUser ? currentUser.uid : 'null') + ', msgUid=' + msgUid);
+    showToast('只能删除自己的留言', 'error'); 
+    return; 
+  }
+  if(!confirm('确定删除这条留言吗？')) return;
+
+  // 管理员删除需要用service_role key，但前端不能放secret key
+  // 所以用当前登录用户的access_token（如果有的话），依赖RLS策略
+  var token = ANON_KEY;
+  if(currentUser && currentUser.token) token = currentUser.token;
+
+  fetch(SUPABASE_URL + "/rest/v1/messages?id=eq." + id, {
+    method: "DELETE",
+    headers: {
+      "apikey": ANON_KEY,
+      "Authorization": "Bearer " + token
+    }
+  })
+  .then(function(r){
+    if(r.ok || r.status === 200 || r.status === 204){
+      showToast('删除成功', 'success');
+      setTimeout(function(){ loadMessages(); }, 300);
+    }else if(r.status === 401){
+      showToast('登录已过期，请重新登录', 'error');
+      setTimeout(function(){ location.href = 'https://cqxjw-class7-2020.pages.dev/login.html'; }, 1500);
+    }else{
+      return r.text().then(function(e){ throw new Error(e || '删除失败，可能权限不足'); });
+    }
+  })
+  .catch(function(err){
+    showToast('删除失败：' + err.message, 'error');
+  });
+}
+
+/* 工具函数 */
+function escapeHtml(str){
+  var div = document.createElement('div');
+  div.textContent = str;
+  return div.innerHTML;
+}
+function formatTime(iso){
+  if(!iso) return '';
+  var d = new Date(iso);
+  var now = new Date();
+  var diff = (now - d) / 1000;
+  if(diff < 60) return '刚刚';
+  if(diff < 3600) return Math.floor(diff/60) + '分钟前';
+  if(diff < 86400) return Math.floor(diff/3600) + '小时前';
+  if(diff < 604800) return Math.floor(diff/86400) + '天前';
+  return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
+}
+
+/* ===== 流动留言模式 ===== */
+var isFloatingMode = true; // 默认进入流动模式
+var allMessages = [];
+
+function toggleMode(){
+  isFloatingMode = !isFloatingMode;
+  var btn = document.getElementById('modeToggle');
+  var container = document.querySelector('.container');
+  var floating = document.getElementById('floatingMode');
+  if(isFloatingMode){
+    btn.textContent = '📋 列表模式';
+    if(container) container.style.display = 'none';
+    if(floating) floating.style.display = 'block';
+    renderFloatingMessages();
+  }else{
+    btn.textContent = '✨ 流动模式';
+    if(container) container.style.display = 'block';
+    if(floating) floating.style.display = 'none';
+    if(floating) floating.innerHTML = '';
+    // 切换到列表模式时重新加载留言列表
+    loadMessages();
+  }
+}
+
+// 弹幕方向：rtl = 从右往左，ttb = 从上往下
+var danmuDirection = 'rtl';
+
+function refreshMessages(){
+  showToast('正在刷新留言...', 'info');
+  loadMessages();
+}
+
+function toggleDanmuDirection(){
+  danmuDirection = (danmuDirection === 'rtl') ? 'ttb' : 'rtl';
+  var btn = document.getElementById('directionToggle');
+  if(btn){
+    btn.textContent = (danmuDirection === 'rtl') ? '⬇️ 从上往下' : '➡️ 从右往左';
+  }
+  if(isFloatingMode) renderFloatingMessages();
+}
+
+function renderFloatingMessages(){
+  var container = document.getElementById('floatingMode');
+  if(!container) return;
+  container.innerHTML = '';
+  
+  var msgs = allMessages.slice();
+  var winH = window.innerHeight;
+  var winW = window.innerWidth;
+  
+  // 轨道系统：避免留言重叠（最多5行）
+  var trackHeight = 70; // 轨道高度，避免重叠
+  var numTracks = Math.min(5, Math.max(3, Math.floor(winH / trackHeight) - 2));
+  var trackNextAvailable = new Array(numTracks).fill(0); // 每个轨道下一条可用的时间
+  
+  msgs.forEach(function(msg, idx){
+    var div = document.createElement('div');
+    div.className = 'floating-msg';
+    if(msg.is_announcement) div.classList.add('announcement');
+    
+    var roleTag = '';
+    var role = getRole(msg);
+    if(role === 'admin' || role === 'super_admin') roleTag = '<span class="f-role role-admin">管理员</span>';
+    else if(role === 'teacher') roleTag = '<span class="f-role role-teacher">老师</span>';
+    else if(role === 'dev') roleTag = '<span class="f-role role-dev">开发者</span>';
+    else if(!msg.uid) roleTag = '<span class="f-role" style="background:rgba(150,150,150,0.15);color:#aaa;border:1px solid rgba(150,150,150,0.2)">访客</span>';
+    
+    var displayName = escapeHtml(msg.name || '匿名');
+    if(msg.student_id && msg.student_id !== 'teacher'){
+      displayName = displayName + ' <span style="color:#7a8ab5;font-size:11px;font-weight:400;">(学号 ' + escapeHtml(msg.student_id) + ')</span>';
+    }
+    
+    div.innerHTML =
+      '<span class="f-name">' + displayName + ' ' + roleTag + '：</span>' +
+      '<span class="f-content">' + escapeHtml(msg.content || '') + '</span>' +
+      '<span class="f-time">' + formatTime(msg.created_at) + '</span>';
+    
+    if(danmuDirection === 'rtl'){
+      div.classList.add('danmu-rtl');
+      // 找到最早可用的轨道
+      var trackIdx = 0;
+      var minTime = trackNextAvailable[0];
+      for(var i = 1; i < numTracks; i++){
+        if(trackNextAvailable[i] < minTime){
+          minTime = trackNextAvailable[i];
+          trackIdx = i;
+        }
+      }
+      var startX = winW + 50;
+      var y = 100 + trackIdx * trackHeight; // 起始y坐标，从顶部开始分布
+      div.style.left = startX + 'px';
+      div.style.top = y + 'px';
+      var msgLen = (msg.content || '').length;
+      var duration = 15 + Math.random() * 10 + Math.min(msgLen / 15, 8); // 增加动画时长，避免重叠
+      div.style.animationDuration = duration + 's';
+      var delay = Math.max(0, minTime);
+      div.style.animationDelay = delay + 's';
+      // 计算这条留言完全离开轨道的时间（从右侧完全进入到完全离开左侧）
+      // 留言宽度大约是内容长度 * 12px + 200px（名字、角色、时间）
+      var msgWidth = Math.min(msgLen * 12 + 250, winW * 0.8);
+      var totalDistance = winW + msgWidth + 100;
+      var speed = totalDistance / duration;
+      var leaveTime = delay + (msgWidth + 100) / speed + 1; // 留言完全进入轨道后，下一条才能进入
+      trackNextAvailable[trackIdx] = leaveTime;
+    }else{
+      div.classList.add('danmu-ttb');
+      // 从上往下的弹幕也使用轨道系统，避免重叠
+      var numCols = Math.min(6, Math.max(3, Math.floor(winW / 320)));
+      var colNextAvailable = new Array(numCols).fill(0);
+      // 找到最早可用的列
+      var colIdx = 0;
+      var minColTime = colNextAvailable[0];
+      for(var j = 1; j < numCols; j++){
+        if(colNextAvailable[j] < minColTime){
+          minColTime = colNextAvailable[j];
+          colIdx = j;
+        }
+      }
+      var colWidth = winW / numCols;
+      var x = 20 + colIdx * colWidth + Math.random() * 30;
+      var startY = -100 - idx * 50;
+      div.style.left = x + 'px';
+      div.style.top = startY + 'px';
+      var duration2 = 16 + Math.random() * 8;
+      div.style.animationDuration = duration2 + 's';
+      var delay2 = Math.max(0, minColTime);
+      div.style.animationDelay = delay2 + 's';
+      // 计算这条留言完全离开列的时间
+      var leaveTime2 = delay2 + 3; // 每条留言间隔至少3秒
+      colNextAvailable[colIdx] = leaveTime2;
+    }
+    
+    container.appendChild(div);
+  });
+}
+
+/* ===== 发布弹窗 ===== */
+function openPostModal(){
+  document.getElementById('postModal').classList.add('show');
+  document.body.style.overflow = 'hidden';
+  // 禁用背景页面的点击事件
+  var controlBtns = document.querySelectorAll('.ctrl-btn, .mode-toggle, .floating-msg');
+  controlBtns.forEach(function(btn){ btn.style.pointerEvents = 'none'; });
+  // 预填名字
+  if(currentUser && currentUser.name){
+    document.getElementById('msgNameModal').value = currentUser.name;
+  }
+  setTimeout(function(){ document.getElementById('msgContentModal').focus(); }, 100);
+}
+
+function closePostModal(){
+  document.getElementById('postModal').classList.remove('show');
+  document.body.style.overflow = '';
+  // 恢复背景页面的点击事件
+  var controlBtns = document.querySelectorAll('.ctrl-btn, .mode-toggle, .floating-msg');
+  controlBtns.forEach(function(btn){ btn.style.pointerEvents = ''; });
+  document.getElementById('msgContentModal').value = '';
+  document.getElementById('charCountModal').textContent = '0 / 500';
+}
+
+function postMessageModal(){
+  var name = document.getElementById('msgNameModal').value.trim();
+  var content = document.getElementById('msgContentModal').value.trim();
+  var isAnn = document.getElementById('isAnnouncementModal').checked;
+  if(!name){ showToast('请输入名字', 'error'); return; }
+  if(name.length > 30){ showToast('名字最多30个字符', 'error'); return; }
+  var validNameRegex = /^[\u4e00-\u9fa5a-zA-Z0-9\s\-\_\.、，。！？]+$/;
+  if(!validNameRegex.test(name)){ showToast('名字包含非法字符，请使用中文、英文或数字', 'error'); return; }
+  if(!content){ showToast('请输入留言内容', 'error'); return; }
+  var body = { name: name, content: content };
+  if(isAdmin && isAnn) body.is_announcement = true;
+  var token = ANON_KEY;
+  if(currentUser && currentUser.token) token = currentUser.token;
+  fetch(SUPABASE_URL + "/rest/v1/messages", {
+    method: "POST",
+    headers: { "apikey": ANON_KEY, "Authorization": "Bearer " + token, "Content-Type": "application/json", "Prefer": "return=representation" },
+    body: JSON.stringify(body)
+  }).then(function(r){
+    if(r.ok || r.status === 201 || r.status === 204){
+      showToast('发布成功', 'success');
+      closePostModal();
+      loadMessages();
+    }else if(r.status === 401){
+      showToast('登录已过期，请重新登录', 'error');
+      setTimeout(function(){ location.href = 'https://cqxjw-class7-2020.pages.dev/login.html'; }, 1500);
+    }else{
+      showToast('发布失败', 'error');
+    }
+  }).catch(function(){ showToast('网络错误', 'error'); });
+}
+
+/* 编辑留言 */
+function editMessage(id, content, el){
+  if(!currentUser){
+    showToast('请先登录', 'error');
+    return;
+  }
+  document.getElementById('editMsgId').value = id;
+  document.getElementById('editContent').value = content;
+  document.getElementById('editCharCount').textContent = content.length + ' / 500';
+  document.getElementById('editModal').classList.add('show');
+}
+
+/* 关闭编辑弹窗 */
+function closeEditModal(){
+  document.getElementById('editModal').classList.remove('show');
+}
+
+/* 保存编辑后的留言 */
+function saveEditMessage(){
+  var id = document.getElementById('editMsgId').value;
+  var content = document.getElementById('editContent').value.trim();
+  if(!content){
+    showToast('留言内容不能为空', 'error');
+    return;
+  }
+  if(!currentUser || !currentUser.token){
+    showToast('请先登录', 'error');
+    return;
+  }
+  
+  fetch(SUPABASE_URL + '/rest/v1/messages?id=eq.' + id, {
+    method: 'PATCH',
+    headers: {
+      'apikey': ANON_KEY,
+      'Authorization': 'Bearer ' + currentUser.token,
+      'Content-Type': 'application/json',
+      'Prefer': 'return=minimal'
+    },
+    body: JSON.stringify({
+      content: content,
+      updated_at: new Date().toISOString()
+    })
+  })
+  .then(function(r){
+    if(r.ok || r.status === 200 || r.status === 204 || r.status === 404){
+      showToast('留言修改成功', 'success');
+      closeEditModal();
+      setTimeout(function(){ loadMessages(); }, 500);
+    }else if(r.status === 401){
+      showToast('登录已过期，请重新登录', 'error');
+      setTimeout(function(){ location.href = 'https://cqxjw-class7-2020.pages.dev/login.html'; }, 1500);
+    }else if(r.status === 403){
+      showToast('没有权限修改这条留言', 'error');
+    }else{
+      return r.text().then(function(e){ throw new Error(e || '修改失败'); });
+    }
+  })
+  .catch(function(err){
+    showToast('修改失败：' + err.message, 'error');
+  });
+}
+
+/* 弹窗字符计数 */
+document.addEventListener('DOMContentLoaded', function(){
+  var ta = document.getElementById('msgContentModal');
+  if(ta){
+    ta.addEventListener('input', function(){
+      document.getElementById('charCountModal').textContent = this.value.length + ' / 500';
+    });
+  }
+  
+  // 编辑弹窗字符计数
+  var editTa = document.getElementById('editContent');
+  if(editTa){
+    editTa.addEventListener('input', function(){
+      document.getElementById('editCharCount').textContent = this.value.length + ' / 500';
+    });
+  }
+  
+  // 初始化：加载留言并默认进入流动模式
+  loadMessages();
+  setTimeout(function(){
+    var container = document.querySelector('.container');
+    var floating = document.getElementById('floatingMode');
+    if(container) container.style.display = 'none';
+    if(floating) floating.style.display = 'block';
+  }, 100);
+});
+</script>
+</body>
+</html>
+
+
+

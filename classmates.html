@@ -1,0 +1,369 @@
+﻿<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<script src="direct-access-check.js"></script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="icon" type="image/png" href="xiaohui.png">
+<title>全员列表 - 谢家湾学校2020级7班 · 毕业记忆</title>
+<style>
+  *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;user-select:none;-webkit-user-select:none}
+  img{-webkit-user-drag:none;user-drag:none}
+  body{font-family:"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif;background:#050810;color:#e0e6f0;min-height:100vh}
+  .bg-fixed{position:fixed;inset:0;z-index:-2;background:url('starbg.jpg') center/cover no-repeat;filter:brightness(0.3) saturate(1.2)}
+  .bg-overlay{position:fixed;inset:0;z-index:-1;background:linear-gradient(180deg,rgba(5,8,16,0.75),rgba(5,8,16,0.92))}
+  .navbar{position:fixed;top:0;left:0;right:0;z-index:100;display:flex;align-items:center;justify-content:space-between;padding:10px 24px;background:rgba(10,14,28,0.8);backdrop-filter:blur(20px);border-bottom:1px solid rgba(255,255,255,0.08)}
+  .nav-brand{display:flex;align-items:center;gap:12px;cursor:pointer}
+  .nav-logo{width:38px;height:38px;border-radius:50%;object-fit:cover;border:2px solid rgba(255,255,255,0.2)}
+  .nav-brand-title{font-size:14px;font-weight:700;color:#e8efff}
+  .nav-brand-sub{font-size:10px;color:#7a8ab5;letter-spacing:1.5px}
+  .nav-back{padding:8px 18px;border-radius:10px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);color:#c8d4f0;font-size:13px;cursor:pointer;transition:all .25s}
+  .nav-back:hover{background:rgba(91,168,255,0.15);border-color:rgba(91,168,255,0.3);color:#fff}
+  .container{padding:120px 24px 60px;max-width:1000px;margin:0 auto}
+  .page-header{text-align:center;margin-bottom:40px}
+  .page-icon{font-size:56px;margin-bottom:16px;opacity:.7}
+  .page-title{font-size:clamp(28px,5vw,42px);font-weight:800;letter-spacing:3px;background:linear-gradient(135deg,#fff,#7bc0ff);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:12px}
+  .page-desc{font-size:15px;color:#7a8ab5;line-height:1.8;max-width:600px;margin:0 auto}
+  .filter-bar{display:flex;gap:10px;margin-bottom:24px;flex-wrap:wrap;justify-content:center}
+  .filter-btn{padding:8px 16px;border-radius:10px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);color:#8a98c0;font-size:13px;cursor:pointer;transition:all .25s}
+  .filter-btn.active{background:rgba(91,168,255,0.15);border-color:rgba(91,168,255,0.4);color:#7bc0ff}
+  .students-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:16px}
+  .student-card{background:rgba(20,24,44,0.6);backdrop-filter:blur(16px);border:1px solid rgba(255,255,255,0.08);border-radius:16px;padding:20px;transition:all .35s;position:relative}
+  .student-card:hover{transform:translateY(-3px);border-color:rgba(91,168,255,0.3);box-shadow:0 12px 32px rgba(0,0,0,0.3)}
+  .student-card.is-self{border-color:rgba(91,168,255,0.5);background:rgba(20,40,70,0.5)}
+  .student-card.is-self::before{content:"我";position:absolute;top:12px;right:12px;width:24px;height:24px;border-radius:50%;background:linear-gradient(135deg,#3b82f6,#a07bff);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#fff}
+  .student-header{display:flex;align-items:center;gap:12px;margin-bottom:12px}
+  .student-avatar{width:44px;height:44px;border-radius:50%;background:linear-gradient(135deg,#3b82f6,#a07bff);display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:700;color:#fff;flex-shrink:0}
+  .student-avatar.teacher{background:linear-gradient(135deg,#f59e0b,#ef4444)}
+  .student-avatar.admin{background:linear-gradient(135deg,#8b5cf6,#ec4899)}
+  .student-info{flex:1;min-width:0}
+  .student-name{font-size:16px;font-weight:700;color:#e8efff;margin-bottom:2px}
+  .student-meta{font-size:11px;color:#7a8ab5;display:flex;gap:8px;align-items:center}
+  .role-tag{padding:2px 8px;border-radius:6px;font-size:10px;font-weight:600}
+  .role-tag.student{background:rgba(59,130,246,0.15);color:#7bc0ff}
+  .role-tag.teacher{background:rgba(245,158,11,0.15);color:#fbbf24}
+  .role-tag.admin{background:rgba(139,92,246,0.15);color:#c4b5fd}
+  .student-bio{font-size:13px;color:#a0aec0;line-height:1.7;background:rgba(0,0,0,0.2);border-radius:10px;padding:12px;margin-top:8px;min-height:40px}
+  .student-bio.empty{color:#5a6890;font-style:italic}
+  .edit-bio-btn{margin-top:10px;padding:6px 14px;border-radius:8px;background:rgba(91,168,255,0.1);border:1px solid rgba(91,168,255,0.3);color:#7bc0ff;font-size:12px;cursor:pointer;transition:all .25s;display:none}
+  .student-card.is-self .edit-bio-btn{display:inline-block}
+  .edit-bio-btn:hover{background:rgba(91,168,255,0.2);border-color:rgba(91,168,255,0.5)}
+  .loading{text-align:center;padding:60px;color:#7a8ab5;font-size:15px}
+  .modal-overlay{position:fixed;inset:0;z-index:1000;background:rgba(0,0,0,0.7);backdrop-filter:blur(4px);display:flex;align-items:center;justify-content:center;padding:20px}
+  .modal{background:#14182c;border-radius:16px;padding:24px;max-width:420px;width:100%;border:1px solid rgba(255,255,255,0.1);box-shadow:0 20px 60px rgba(0,0,0,0.5)}
+  .modal-title{font-size:18px;font-weight:700;color:#e8efff;margin-bottom:16px}
+  .modal-textarea{width:100%;min-height:100px;padding:12px;border-radius:10px;background:rgba(0,0,0,0.3);border:1px solid rgba(255,255,255,0.1);color:#e0e6f0;font-size:14px;font-family:inherit;resize:vertical;line-height:1.6}
+  .modal-textarea:focus{outline:none;border-color:rgba(91,168,255,0.5)}
+  .modal-actions{display:flex;gap:10px;margin-top:16px;justify-content:flex-end}
+  .modal-btn{padding:8px 20px;border-radius:10px;font-size:13px;font-weight:600;cursor:pointer;transition:all .25s;border:1px solid transparent}
+  .modal-btn.cancel{background:rgba(255,255,255,0.05);border-color:rgba(255,255,255,0.1);color:#a0aec0}
+  .modal-btn.cancel:hover{background:rgba(255,255,255,0.1)}
+  .modal-btn.confirm{background:linear-gradient(135deg,#3b82f6,#a07bff);color:#fff}
+  .modal-btn.confirm:hover{transform:translateY(-1px);box-shadow:0 4px 12px rgba(59,130,246,0.3)}
+  .toast{position:fixed;top:80px;left:50%;transform:translateX(-50%);z-index:2000;padding:12px 24px;border-radius:10px;font-size:14px;font-weight:600;animation:slideDown .3s ease}
+  .toast.success{background:rgba(34,197,94,0.9);color:#fff}
+  .toast.error{background:rgba(239,68,68,0.9);color:#fff}
+  @keyframes slideDown{from{opacity:0;transform:translate(-50%,-20px)}to{opacity:1;transform:translate(-50%,0)}}
+  @media(max-width:600px){.navbar{padding:10px 16px}.nav-brand-title{font-size:12px}.container{padding:100px 16px 40px}.students-grid{grid-template-columns:1fr}}
+</style>
+<script src="bgm.js"></script>
+<script src="auth-check.js"></script>
+</head>
+<body>
+<div class="bg-fixed"></div><div class="bg-overlay"></div>
+<nav class="navbar">
+  <div class="nav-brand" onclick="goBack()">
+    <img src="xiaohui.png" class="nav-logo" alt="校徽">
+    <div><div class="nav-brand-title">谢家湾学校 2020级7班</div><div class="nav-brand-sub">毕业记忆</div></div>
+  </div>
+  <div style="display:flex;align-items:center;gap:12px;">
+    <div id="navUser" style="display:flex;align-items:center;gap:8px;">
+      <div id="navAvatar" style="width:30px;height:30px;border-radius:50%;background:linear-gradient(135deg,#3b82f6,#a07bff);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:#fff;">?</div>
+      <span id="navUsername" style="font-size:12px;color:#c8d4f0;">未登录</span>
+    </div>
+    <div class="nav-back" onclick="goBack()">← 返回</div>
+  </div>
+</nav>
+
+<div class="container">
+  <div class="page-header">
+    <div class="page-icon">👥</div>
+    <h1 class="page-title">全员列表</h1>
+    <p class="page-desc">2020级7班全体同学与老师，点击自己的卡片可以编辑个性签名</p>
+  </div>
+
+  <div class="filter-bar">
+    <button class="filter-btn active" onclick="filterStudents('all',this)">全部</button>
+    <button class="filter-btn" onclick="filterStudents('student',this)">同学</button>
+    <button class="filter-btn" onclick="filterStudents('teacher',this)">老师</button>
+    <button class="filter-btn" onclick="filterStudents('admin',this)">管理员</button>
+    <button class="filter-btn" onclick="filterStudents('other',this)">其他用户</button>
+  </div>
+
+  <div id="studentsGrid" class="students-grid">
+    <div class="loading">加载中...</div>
+  </div>
+</div>
+
+<!-- 编辑弹窗 -->
+<div id="editModal" class="modal-overlay" style="display:none">
+  <div class="modal">
+    <div class="modal-title">✏️ 编辑个人资料</div>
+    <div style="margin-bottom:12px">
+      <label style="font-size:12px;color:#7a8ab5;display:block;margin-bottom:6px">自定义昵称（可选）</label>
+      <input type="text" id="nicknameInput" class="modal-textarea" style="min-height:auto;padding:10px 12px;" placeholder="不填则显示真名" maxlength="20">
+    </div>
+    <div style="margin-bottom:4px">
+      <label style="font-size:12px;color:#7a8ab5;display:block;margin-bottom:6px">个性签名</label>
+      <textarea id="bioTextarea" class="modal-textarea" placeholder="写下你的个性签名..." maxlength="100"></textarea>
+    </div>
+    <div style="font-size:11px;color:#5a6890;margin-top:6px;text-align:right"><span id="bioCount">0</span>/100</div>
+    <div class="modal-actions">
+      <button class="modal-btn cancel" onclick="closeEditModal()">取消</button>
+      <button class="modal-btn confirm" onclick="saveProfile()">保存</button>
+    </div>
+  </div>
+</div>
+
+<script>
+  // Supabase配置
+  var SUPABASE_URL = "https://ekfntkpjqzmkibdimtru.supabase.co";
+  var ANON_KEY = "sb_publishable_Z3wpxD9ZRbXm9-gPPQOGZg_KKhr_yIs";
+  var SUPER_ADMIN_UID = "919f3af0-801d-4d7b-87b4-03bedc9d2896";
+
+  var allStudents = [];
+  var currentFilter = 'all';
+  var currentUser = null;
+  var editingStudentId = null;
+
+  // 获取当前登录用户
+  function getCurrentUser() {
+    try {
+      var sess = JSON.parse(localStorage.getItem('sb_session') || sessionStorage.getItem('sb_session') || 'null');
+      var adm = JSON.parse(localStorage.getItem('sb_admin') || 'null');
+      return sess || adm;
+    } catch(e) { return null; }
+  }
+
+  // 更新导航栏用户信息
+  function updateNavUser() {
+    currentUser = getCurrentUser();
+    var avatar = document.getElementById('navAvatar');
+    var username = document.getElementById('navUsername');
+    if (currentUser && currentUser.name) {
+      avatar.textContent = currentUser.name.charAt(0);
+      username.textContent = currentUser.name;
+    } else {
+      avatar.textContent = '?';
+      username.textContent = '未登录';
+    }
+  }
+
+  // 返回
+  function goBack() {
+    if (document.referrer) {
+      history.back();
+    } else {
+      location.href = 'https://cqxjw-class7-2020-2.pages.dev/a3x7k2m9p4q8r3t6w1y5u0i2o4.html';
+    }
+  }
+
+  // HTML转义
+  function escapeHtml(str) {
+    if (str == null) return '';
+    var div = document.createElement('div');
+    div.textContent = String(str);
+    return div.innerHTML;
+  }
+
+  // 显示提示
+  function showToast(msg, type) {
+    var toast = document.createElement('div');
+    toast.className = 'toast ' + (type || 'success');
+    toast.textContent = msg;
+    document.body.appendChild(toast);
+    setTimeout(function() { toast.remove(); }, 2500);
+  }
+
+  // 加载全员列表
+  function loadStudents() {
+    var url = SUPABASE_URL + "/rest/v1/student_profiles?select=*&order=student_id.asc";
+    var xhr = new XMLHttpRequest();
+    xhr.open("GET", url, true);
+    xhr.setRequestHeader("apikey", ANON_KEY);
+    xhr.setRequestHeader("Authorization", "Bearer " + ANON_KEY);
+    xhr.onload = function() {
+      try {
+        var data = JSON.parse(xhr.responseText);
+        // 排除超级管理员
+        allStudents = data.filter(function(s) { return s.user_id !== SUPER_ADMIN_UID; });
+        renderStudents();
+      } catch(e) {
+        document.getElementById('studentsGrid').innerHTML = '<div class="loading">加载失败</div>';
+      }
+    };
+    xhr.onerror = function() {
+      document.getElementById('studentsGrid').innerHTML = '<div class="loading">加载失败</div>';
+    };
+    xhr.send();
+  }
+
+  // 判断角色（智能检测角色设定）
+  function getRole(student) {
+    if (student.student_id === 'teacher' || student.name === '邓老师' || student.role === 'teacher') return 'teacher';
+    if (student.role === 'admin' || student.role === 'super_admin') return 'admin';
+    if (student.role === 'unrestricted') return 'unrestricted';
+    // 其他用户：没有学号、不是老师、不是管理员的新增用户
+    if (!student.student_id || student.student_id === '' || student.student_id === 'other') return 'other';
+    return 'student';
+  }
+
+  // 渲染学生列表
+  function renderStudents() {
+    var grid = document.getElementById('studentsGrid');
+    var filtered = allStudents;
+    if (currentFilter !== 'all') {
+      filtered = allStudents.filter(function(s) { return getRole(s) === currentFilter; });
+    }
+
+    if (filtered.length === 0) {
+      grid.innerHTML = '<div class="loading">暂无数据</div>';
+      return;
+    }
+
+    grid.innerHTML = '';
+    for (var i = 0; i < filtered.length; i++) {
+      var s = filtered[i];
+      var role = getRole(s);
+      var isSelf = false;
+      if(currentUser && currentUser.uid && s.user_id){
+        // 不区分大小写比较UID
+        isSelf = currentUser.uid.toLowerCase() === s.user_id.toLowerCase();
+      }
+      console.log('isSelf检查：currentUser.uid=' + (currentUser ? currentUser.uid : 'null') + ', s.user_id=' + s.user_id + ', isSelf=' + isSelf);
+      var avatarClass = role === 'teacher' ? 'teacher' : (role === 'admin' ? 'admin' : (role === 'other' ? 'other' : ''));
+      var roleText = role === 'teacher' ? '老师' : (role === 'admin' ? '管理员' : (role === 'unrestricted' ? '不受管控' : (role === 'other' ? '其他用户' : '同学')));
+      var bioText = s.bio && s.bio.trim() ? escapeHtml(s.bio) : '这个人很懒，什么都没写~';
+      var bioClass = s.bio && s.bio.trim() ? '' : 'empty';
+      var sidText = s.student_id && s.student_id !== 'teacher' && s.student_id !== 'other' ? '学号 ' + s.student_id : '';
+      // 显示名称：有昵称显示昵称，后面加浅灰色括号显示真名+学号
+      var displayName = '';
+      if (s.nickname && s.nickname.trim()) {
+        var realInfo = s.name + (s.student_id && s.student_id !== 'teacher' ? ' ' + s.student_id : '');
+        displayName = escapeHtml(s.nickname) + ' <span style="color:#5a6890;font-size:12px;font-weight:400;">(' + escapeHtml(realInfo) + ')</span>';
+      } else {
+        displayName = escapeHtml(s.name || '未知');
+      }
+
+      var card = document.createElement('div');
+      card.className = 'student-card' + (isSelf ? ' is-self' : '');
+      card.innerHTML =
+        '<div class="student-header">' +
+          '<div class="student-avatar ' + avatarClass + '">' + escapeHtml((s.nickname || s.name || '?').charAt(0)) + '</div>' +
+          '<div class="student-info">' +
+            '<div class="student-name">' + displayName + '</div>' +
+            '<div class="student-meta">' +
+              '<span class="role-tag ' + role + '">' + roleText + '</span>' +
+              (sidText ? '<span>' + sidText + '</span>' : '') +
+            '</div>' +
+          '</div>' +
+        '</div>' +
+        '<div class="student-bio ' + bioClass + '">' + bioText + '</div>' +
+        (isSelf ? '<button class="edit-bio-btn" onclick="openEditModal(\'' + s.id + '\')">✏️ 编辑个人资料</button>' : '');
+      grid.appendChild(card);
+    }
+  }
+
+  // 筛选
+  function filterStudents(type, btn) {
+    currentFilter = type;
+    document.querySelectorAll('.filter-btn').forEach(function(b) { b.classList.remove('active'); });
+    btn.classList.add('active');
+    renderStudents();
+  }
+
+  // 打开编辑弹窗
+  function openEditModal(id) {
+    if (!currentUser) {
+      showToast('请先登录', 'error');
+      return;
+    }
+    var student = allStudents.find(function(s) { return s.id === id; });
+    var canEdit = false;
+    if(student && currentUser.uid && student.user_id){
+      canEdit = currentUser.uid.toLowerCase() === student.user_id.toLowerCase();
+    }
+    if (!student || !canEdit) {
+      console.log('编辑权限检查：currentUser.uid=' + (currentUser ? currentUser.uid : 'null') + ', student.user_id=' + (student ? student.user_id : 'null'));
+      showToast('只能编辑自己的资料', 'error');
+      return;
+    }
+    editingStudentId = id;
+    document.getElementById('nicknameInput').value = student.nickname || '';
+    document.getElementById('bioTextarea').value = student.bio || '';
+    document.getElementById('bioCount').textContent = (student.bio || '').length;
+    document.getElementById('editModal').style.display = 'flex';
+  }
+
+  // 关闭编辑弹窗
+  function closeEditModal() {
+    document.getElementById('editModal').style.display = 'none';
+    editingStudentId = null;
+  }
+
+  // 保存个人资料
+  function saveProfile() {
+    if (!editingStudentId || !currentUser) return;
+    var nickname = document.getElementById('nicknameInput').value.trim();
+    var bio = document.getElementById('bioTextarea').value.trim();
+    if (bio.length > 100) {
+      showToast('签名不能超过100字', 'error');
+      return;
+    }
+    if (nickname.length > 30) {
+      showToast('昵称不能超过30字', 'error');
+      return;
+    }
+
+    var url = SUPABASE_URL + "/rest/v1/student_profiles?id=eq." + editingStudentId;
+    var body = JSON.stringify({ 
+      nickname: nickname,
+      bio: bio, 
+      updated_at: new Date().toISOString() 
+    });
+    var xhr = new XMLHttpRequest();
+    xhr.open("PATCH", url, true);
+    xhr.setRequestHeader("apikey", ANON_KEY);
+    xhr.setRequestHeader("Authorization", "Bearer " + (currentUser.token || ANON_KEY));
+    xhr.setRequestHeader("Content-Type", "application/json");
+    xhr.setRequestHeader("Prefer", "return=minimal");
+    xhr.onload = function() {
+      if (xhr.status >= 200 && xhr.status < 300 || xhr.status === 204 || xhr.status === 404) {
+        showToast('资料保存成功');
+        closeEditModal();
+        setTimeout(function(){ loadStudents(); }, 500);
+      } else {
+        showToast('保存失败: ' + xhr.status, 'error');
+      }
+    };
+    xhr.onerror = function() { showToast('网络错误', 'error'); };
+    xhr.send(body);
+  }
+
+  // 签名字数统计
+  document.addEventListener('DOMContentLoaded', function() {
+    updateNavUser();
+    loadStudents();
+    document.getElementById('bioTextarea').addEventListener('input', function() {
+      document.getElementById('bioCount').textContent = this.value.length;
+    });
+    // 点击弹窗外部关闭
+    document.getElementById('editModal').addEventListener('click', function(e) {
+      if (e.target === this) closeEditModal();
+    });
+  });
+</script>
+</body>
+</html>
+
+

@@ -1,0 +1,230 @@
+﻿<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="icon" type="image/png" href="xiaohui.png">
+<title>开发者名单 - 谢家湾学校2020级7班 · 毕业记忆</title>
+<style>
+  *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;user-select:none;-webkit-user-select:none}
+  input,textarea{user-select:text;-webkit-user-select:text}
+  img{-webkit-user-drag:none;user-drag:none}
+  body{
+    font-family:"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif;
+    background:#050810;color:#e0e6f0;overflow-x:hidden;min-height:100vh;
+  }
+  .bg-fixed{position:fixed;inset:0;z-index:-2;background:url('starbg.jpg') center/cover no-repeat;filter:brightness(0.3) saturate(1.2)}
+  .bg-overlay{position:fixed;inset:0;z-index:-1;background:linear-gradient(180deg,rgba(5,8,16,0.7) 0%,rgba(5,8,16,0.9) 100%)}
+
+  /* 导航栏 */
+  .navbar{
+    position:fixed;top:0;left:0;right:0;z-index:100;
+    display:flex;align-items:center;justify-content:space-between;
+    padding:10px 24px;
+    background:rgba(10,14,28,0.8);backdrop-filter:blur(20px);
+    border-bottom:1px solid rgba(255,255,255,0.08);
+  }
+  .nav-brand{display:flex;align-items:center;gap:12px;cursor:pointer}
+  .nav-logo{width:38px;height:38px;border-radius:50%;object-fit:cover;border:2px solid rgba(255,255,255,0.2)}
+  .nav-brand-text{display:flex;flex-direction:column;line-height:1.3}
+  .nav-brand-title{font-size:14px;font-weight:700;color:#e8efff}
+  .nav-brand-sub{font-size:10px;color:#7a8ab5;letter-spacing:1.5px}
+  .nav-back{
+    padding:8px 18px;border-radius:10px;
+    background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);
+    color:#c8d4f0;font-size:13px;cursor:pointer;transition:all .25s;
+  }
+  .nav-back:hover{background:rgba(91,168,255,0.15);border-color:rgba(91,168,255,0.3);color:#fff}
+
+  /* 主内容 */
+  .container{
+    min-height:100vh;display:flex;flex-direction:column;
+    align-items:center;justify-content:center;
+    padding:100px 24px 60px;
+  }
+  .page-title{
+    font-size:clamp(28px,5vw,48px);font-weight:800;letter-spacing:4px;
+    background:linear-gradient(135deg,#fff,#7bc0ff,#a07bff);
+    -webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;
+    margin-bottom:12px;text-align:center;
+  }
+  .page-subtitle{font-size:15px;color:#7a8ab5;letter-spacing:2px;margin-bottom:60px;text-align:center}
+
+  /* 开发者三角形布局 */
+  .dev-triangle{
+    position:relative;width:100%;max-width:700px;
+    display:flex;flex-direction:column;align-items:center;gap:40px;
+  }
+  .dev-top{display:flex;justify-content:center;width:100%}
+  .dev-bottom{display:flex;justify-content:center;gap:80px;width:100%}
+
+  .dev-card{
+    display:flex;flex-direction:column;align-items:center;gap:14px;
+    transition:all .4s cubic-bezier(.22,1,.36,1);
+    cursor:default;
+  }
+  .dev-card:hover{transform:translateY(-8px)}
+  .dev-avatar{
+    width:clamp(100px,18vw,160px);height:clamp(100px,18vw,160px);
+    border-radius:50%;object-fit:cover;
+    border:3px solid rgba(91,168,255,0.4);
+    box-shadow:0 0 40px rgba(91,168,255,0.2),0 8px 30px rgba(0,0,0,0.4);
+    transition:all .4s;
+  }
+  .dev-card:hover .dev-avatar{
+    border-color:rgba(160,123,255,0.6);
+    box-shadow:0 0 60px rgba(160,123,255,0.3),0 12px 40px rgba(0,0,0,0.5);
+  }
+  .dev-avatar.lead{
+    width:clamp(130px,22vw,190px);height:clamp(130px,22vw,190px);
+    border-color:rgba(255,200,80,0.5);
+    box-shadow:0 0 50px rgba(255,200,80,0.25),0 8px 30px rgba(0,0,0,0.4);
+  }
+  .dev-card:hover .dev-avatar.lead{
+    border-color:rgba(255,180,50,0.7);
+    box-shadow:0 0 70px rgba(255,180,50,0.35),0 12px 40px rgba(0,0,0,0.5);
+  }
+  .dev-info{text-align:center}
+  .dev-name{font-size:18px;font-weight:700;color:#e8efff;margin-bottom:4px}
+  .dev-role{font-size:12px;color:#7bc0ff;letter-spacing:1.5px}
+  .dev-role.lead{color:#ffc850}
+  .dev-badge{
+    display:inline-block;padding:3px 10px;border-radius:10px;
+    font-size:10px;letter-spacing:1px;margin-top:6px;
+  }
+  .dev-badge.lead{background:rgba(255,200,80,0.15);border:1px solid rgba(255,200,80,0.3);color:#ffc850}
+  .dev-badge.test{background:rgba(91,168,255,0.1);border:1px solid rgba(91,168,255,0.25);color:#7bc0ff}
+
+  /* 连接线 */
+  .connector{
+    position:absolute;z-index:-1;
+    border-left:1px dashed rgba(91,168,255,0.2);
+    border-bottom:1px dashed rgba(91,168,255,0.2);
+  }
+
+  .footer-note{
+    margin-top:60px;text-align:center;font-size:13px;color:#5a6890;line-height:2;
+  }
+  .footer-note b{color:#7a8ab5}
+
+  @media(max-width:600px){
+    .dev-bottom{gap:30px}
+    .dev-name{font-size:15px}
+    .navbar{padding:10px 16px}
+    .nav-brand-title{font-size:12px}
+  }
+</style>
+<script src="bgm.js"></script>
+<script src="auth-check.js"></script>
+</head>
+<body>
+
+<div class="bg-fixed"></div>
+<div class="bg-overlay"></div>
+
+<nav class="navbar">
+  <div class="nav-brand" onclick="goBack()">
+    <img src="xiaohui.png" class="nav-logo" alt="校徽">
+    <div class="nav-brand-text">
+      <span class="nav-brand-title">谢家湾学校 2020级7班</span>
+      <span class="nav-brand-sub">毕业记忆</span>
+    </div>
+  </div>
+  <div style="display:flex;align-items:center;gap:12px;">
+    <div id="navUser" style="display:flex;align-items:center;gap:8px;">
+      <div id="navAvatar" style="width:30px;height:30px;border-radius:50%;background:linear-gradient(135deg,#3b82f6,#a07bff);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:#fff;">?</div>
+      <span id="navUsername" style="font-size:12px;color:#c8d4f0;">未登录</span>
+    </div>
+    <div class="nav-back" onclick="goBack()">← 返回</div>
+  </div>
+</nav>
+
+<div class="container">
+  <h1 class="page-title">开发者名单</h1>
+  <p class="page-subtitle">感谢以下同学为本网站的建设付出的努力</p>
+
+  <div class="dev-triangle">
+    <!-- 主开发者：12号，在最上面 -->
+    <div class="dev-top">
+      <div class="dev-card">
+        <img src="avatars/12号头像.png" class="dev-avatar lead" alt="12号">
+        <div class="dev-info">
+          <div class="dev-name">周子义</div>
+          <div class="dev-role lead">主开发者</div>
+          <div class="dev-badge lead">★ 网站架构与核心开发</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 测试支持：3号左下，19号右下 -->
+    <div class="dev-bottom">
+      <div class="dev-card">
+        <img src="avatars/3号头像.png" class="dev-avatar" alt="3号">
+        <div class="dev-info">
+          <div class="dev-name">陶柏彦</div>
+          <div class="dev-role">测试支持</div>
+          <div class="dev-badge test">网站测试与反馈</div>
+        </div>
+      </div>
+      <div class="dev-card">
+        <img src="avatars/19号头像.png" class="dev-avatar" alt="19号">
+        <div class="dev-info">
+          <div class="dev-name">毛艺杰</div>
+          <div class="dev-role">测试支持</div>
+          <div class="dev-badge test">网站测试与反馈</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <p class="footer-note">
+    <b>聚是烈火，散为辰星 · 七班七班，所向披靡</b><br>
+    <span style="color:#4a5880;font-size:11px">© 2026 Class 7, Grade 2020. All rights reserved.</span>
+  </p>
+</div>
+
+<script>
+/* 返回：根据模式跳转 */
+function goBack(){
+  if(sessionStorage.getItem('mode') === 'visitor'){
+    location.href = 'https://cqxjw-class7-2020-2.pages.dev/visitor.html';
+  }else{
+    location.href = 'https://cqxjw-class7-2020-2.pages.dev/a3x7k2m9p4q8r3t6w1y5u0i2o4.html';
+  }
+}
+/* 显示当前账号状态 */
+(function(){
+  try{
+    var sess = JSON.parse(localStorage.getItem('sb_session')||'null');
+    var adm = JSON.parse(localStorage.getItem('sb_admin')||'null');
+    var user = sess || adm;
+    if(user && user.name){
+      document.getElementById('navUsername').textContent = user.name;
+      document.getElementById('navAvatar').textContent = user.name.charAt(0);
+    }else if(sessionStorage.getItem('mode') === 'visitor'){
+      document.getElementById('navUsername').textContent = '访客';
+      document.getElementById('navAvatar').textContent = '访';
+      document.getElementById('navAvatar').style.background = 'linear-gradient(135deg,#6b7280,#9ca3af)';
+    }
+  }catch(e){}
+})();
+
+/* 防直达检测：必须有登录标记+session，或访客验证标记 */
+(function(){
+  var ok = false;
+  var hasSession = localStorage.getItem('sb_session') || localStorage.getItem('sb_admin');
+  if(sessionStorage.getItem('logged_in') && hasSession) ok = true;
+  else if(localStorage.getItem('logged_in') && hasSession){
+    var exp = parseInt(localStorage.getItem('login_expire')||'0');
+    if(Date.now() < exp){ ok = true; sessionStorage.setItem('logged_in','1'); }
+    else{ localStorage.removeItem('logged_in'); localStorage.removeItem('login_expire'); localStorage.removeItem('sb_session'); localStorage.removeItem('sb_admin'); }
+  }
+  if(sessionStorage.getItem('visitor_verified')) ok = true;
+  if(!ok) location.href = 'https://cqxjw-class7-2020.pages.dev/login.html';
+})();
+</script>
+</body>
+</html>
+
+
+

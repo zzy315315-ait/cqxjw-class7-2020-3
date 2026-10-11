@@ -1,0 +1,360 @@
+﻿<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<script src="direct-access-check.js"></script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="icon" type="image/png" href="xiaohui.png">
+<title>与管理者交流 - 谢家湾学校2020级7班 · 毕业记忆</title>
+<style>
+  *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;user-select:none;-webkit-user-select:none}
+  input,textarea{user-select:text;-webkit-user-select:text}
+  body{font-family:"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif;background:#050810;color:#e0e6f0;min-height:100vh}
+  .bg-fixed{position:fixed;inset:0;z-index:-2;background:url('starbg.jpg') center/cover no-repeat;filter:brightness(0.3) saturate(1.2)}
+  .bg-overlay{position:fixed;inset:0;z-index:-1;background:linear-gradient(180deg,rgba(5,8,16,0.75),rgba(5,8,16,0.92))}
+  .navbar{position:fixed;top:0;left:0;right:0;z-index:100;display:flex;align-items:center;justify-content:space-between;padding:10px 24px;background:rgba(10,14,28,0.8);backdrop-filter:blur(20px);border-bottom:1px solid rgba(255,255,255,0.08)}
+  .nav-brand{display:flex;align-items:center;gap:12px;cursor:pointer}
+  .nav-logo{width:38px;height:38px;border-radius:50%;object-fit:cover;border:2px solid rgba(255,255,255,0.2)}
+  .nav-brand-title{font-size:14px;font-weight:700;color:#e8efff}
+  .nav-brand-sub{font-size:10px;color:#7a8ab5;letter-spacing:1.5px}
+  .nav-back{padding:8px 18px;border-radius:10px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);color:#c8d4f0;font-size:13px;cursor:pointer;transition:all .25s}
+  .nav-back:hover{background:rgba(91,168,255,0.15);border-color:rgba(91,168,255,0.3);color:#fff}
+  .container{padding:100px 24px 60px;max-width:800px;margin:0 auto}
+  .page-header{text-align:center;margin-bottom:28px}
+  .page-icon{font-size:44px;margin-bottom:12px;opacity:.85}
+  .page-title{font-size:clamp(24px,5vw,30px);font-weight:800;letter-spacing:2px;background:linear-gradient(135deg,#fff,#7bc0ff,#a07bff);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:8px}
+  .page-desc{font-size:13px;color:#7a8ab5;line-height:1.8}
+  .chat-container{background:rgba(20,24,44,0.7);backdrop-filter:blur(24px);border:1px solid rgba(255,255,255,0.1);border-radius:18px;padding:24px;box-shadow:0 12px 40px rgba(0,0,0,0.3);min-height:500px;display:flex;flex-direction:column}
+  .chat-messages{flex:1;overflow-y:auto;margin-bottom:16px;max-height:500px}
+  .chat-msg{margin-bottom:16px;display:flex;flex-direction:column}
+  .chat-msg.user{align-items:flex-end}
+  .chat-msg.admin{align-items:flex-start}
+  .chat-bubble{max-width:70%;padding:12px 16px;border-radius:16px;font-size:14px;line-height:1.6;word-wrap:break-word}
+  .chat-msg.user .chat-bubble{background:linear-gradient(135deg,#3b82f6,#2563eb);color:#fff;border-bottom-right-radius:4px}
+  .chat-msg.admin .chat-bubble{background:rgba(255,255,255,0.08);color:#e8efff;border:1px solid rgba(255,255,255,0.1);border-bottom-left-radius:4px}
+  .chat-meta{font-size:11px;color:#5a6890;margin-top:4px}
+  .chat-input{display:flex;gap:12px}
+  .chat-input textarea{flex:1;padding:12px 16px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.12);border-radius:12px;color:#e8efff;font-size:14px;outline:none;transition:all .25s;font-family:inherit;resize:none;min-height:50px;max-height:120px}
+  .chat-input textarea:focus{border-color:rgba(91,168,255,0.5);background:rgba(91,168,255,0.08)}
+  .chat-input button{padding:12px 24px;background:linear-gradient(135deg,#3b82f6,#2563eb);border:none;border-radius:12px;color:#fff;font-size:14px;font-weight:700;cursor:pointer;transition:all .25s;align-self:flex-end}
+  .chat-input button:hover:not(:disabled){transform:translateY(-1px);box-shadow:0 6px 20px rgba(59,130,246,0.4)}
+  .chat-input button:disabled{opacity:.5;cursor:not-allowed}
+  .empty-state{text-align:center;padding:60px 20px;color:#5a6890}
+  .empty-icon{font-size:48px;margin-bottom:12px;opacity:.5}
+  .empty-text{font-size:14px}
+  .toast{position:fixed;top:30px;left:50%;transform:translateX(-50%) translateY(-20px);padding:14px 24px;border-radius:12px;font-size:14px;font-weight:600;z-index:999;opacity:0;transition:all .3s;pointer-events:none;backdrop-filter:blur(12px);max-width:90%;text-align:center}
+  .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+  .toast.success{background:rgba(34,197,94,0.9);border:1px solid rgba(74,222,128,0.3);color:#fff}
+  .toast.error{background:rgba(239,68,68,0.9);border:1px solid rgba(248,113,113,0.3);color:#fff}
+  .toast.info{background:rgba(59,130,246,0.9);border:1px solid rgba(96,165,250,0.3);color:#fff}
+  @media(max-width:480px){.container{padding:90px 16px 40px}.chat-container{padding:16px}.chat-bubble{max-width:85%}}
+</style>
+<script src="bgm.js"></script>
+</head>
+<body>
+<div class="bg-fixed"></div><div class="bg-overlay"></div>
+
+<nav class="navbar">
+  <div class="nav-brand" onclick="goBack()">
+    <img src="xiaohui.png" class="nav-logo" alt="校徽">
+    <div>
+      <div class="nav-brand-title">谢家湾学校 2020级7班</div>
+      <div class="nav-brand-sub">毕业记忆 · CLASS 7</div>
+    </div>
+  </div>
+  <div class="nav-back" onclick="goBack()">← 返回</div>
+</nav>
+
+<div class="container">
+  <div class="page-header">
+    <div class="page-icon">💬</div>
+    <div class="page-title">与管理者交流</div>
+    <div class="page-desc">有问题或建议？在这里与管理员直接交流</div>
+  </div>
+
+  <div class="chat-container">
+    <div class="chat-messages" id="chatMessages">
+      <div class="empty-state">
+        <div class="empty-icon">💬</div>
+        <div class="empty-text">还没有对话，发送第一条消息开始交流吧</div>
+      </div>
+    </div>
+    <div class="chat-input">
+      <textarea id="chatInput" placeholder="输入你想说的话..." maxlength="500"></textarea>
+      <button id="sendBtn" onclick="sendMessage()">发送</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+var SUPABASE_URL = "https://ekfntkpjqzmkibdimtru.supabase.co";
+var ANON_KEY = "sb_publishable_Z3wpxD9ZRbXm9-gPPQOGZg_KKhr_yIs";
+var currentUser = null;
+var isAdmin = false;
+var ticketId = null;
+var ticketInfo = null;
+var conversationEnded = false;
+var conversations = [];
+
+// 从URL参数中获取ticket_id
+function getTicketIdFromUrl(){
+  var params = new URLSearchParams(window.location.search);
+  return params.get('ticket_id');
+}
+
+// 检查用户是否登录
+function checkLogin(){
+  try{
+    var sess = JSON.parse(localStorage.getItem('sb_session') || sessionStorage.getItem('sb_session') || 'null');
+    var adm = JSON.parse(localStorage.getItem('sb_admin') || sessionStorage.getItem('sb_admin') || 'null');
+    currentUser = sess || adm;
+    isAdmin = !!(adm && adm.uid) || (currentUser && (currentUser.role === 'admin' || currentUser.role === 'super_admin'));
+    if(!currentUser || !currentUser.token){
+      showToast('请先登录', 'error');
+      setTimeout(function(){ location.href = 'https://cqxjw-class7-2020.pages.dev/login.html'; }, 1500);
+      return false;
+    }
+    return true;
+  }catch(e){
+    location.href = 'https://cqxjw-class7-2020.pages.dev/login.html';
+    return false;
+  }
+}
+
+// 加载反馈信息，检查用户权限和对话状态
+function loadTicketInfo(){
+  if(!ticketId){
+    showError('缺少反馈ID，无法进入对话');
+    return;
+  }
+  
+  fetch(SUPABASE_URL + '/rest/v1/support_tickets?id=eq.' + ticketId + '&select=*', {
+    headers: {'apikey': ANON_KEY, 'Authorization': 'Bearer ' + currentUser.token}
+  })
+  .then(function(r){ return r.json(); })
+  .then(function(data){
+    if(!data || data.length === 0){
+      showError('反馈不存在，无法进入对话');
+      return;
+    }
+    ticketInfo = data[0];
+    
+    // 检查用户权限：只有反馈所有者和管理员才能进入
+    var isOwner = ticketInfo.user_id && ticketInfo.user_id !== 'None' && ticketInfo.user_id !== 'null' && currentUser.uid === ticketInfo.user_id;
+    if(!isOwner && !isAdmin){
+      showError('你没有权限进入这个对话');
+      return;
+    }
+    
+    // 检查是否有管理员回复
+    if(!ticketInfo.admin_reply || ticketInfo.admin_reply.trim() === ''){
+      showError('管理员还未回复，请等待管理员回复后再进入对话');
+      return;
+    }
+    
+    // 检查对话是否已结束
+    if(ticketInfo.conversation_ended === true || ticketInfo.status === 'closed'){
+      conversationEnded = true;
+      showConversationEnded();
+    }else{
+      // 显示管理员操作按钮
+      if(isAdmin){
+        document.getElementById('adminActions').style.display = 'block';
+      }
+    }
+    
+    // 加载对话历史
+    loadConversations();
+  })
+  .catch(function(err){
+    console.error('加载反馈信息失败:', err);
+    showError('加载失败：' + err.message);
+  });
+}
+
+// 显示错误
+function showError(msg){
+  var container = document.getElementById('chatMessages');
+  container.innerHTML = '<div class="empty-state"><div class="empty-icon">❌</div><div class="empty-text">' + escapeHtml(msg) + '</div></div>';
+  document.getElementById('chatInputArea').style.display = 'none';
+  document.getElementById('adminActions').style.display = 'none';
+}
+
+// 显示对话已结束
+function showConversationEnded(){
+  var status = document.getElementById('conversationStatus');
+  status.style.display = 'block';
+  status.style.background = 'rgba(239,68,68,0.1)';
+  status.style.border = '1px solid rgba(239,68,68,0.2)';
+  status.style.color = '#f87171';
+  status.textContent = '⚠️ 对话已结束，管理员已关闭此对话。你可以查看历史消息，但不能发送新消息。';
+  document.getElementById('chatInputArea').style.display = 'none';
+  document.getElementById('adminActions').style.display = 'none';
+}
+
+// 加载对话历史
+function loadConversations(){
+  if(!currentUser || !ticketId) return;
+  
+  fetch(SUPABASE_URL + '/rest/v1/conversations?select=*&ticket_id=eq.' + ticketId + '&order=created_at.asc', {
+    headers: {'apikey': ANON_KEY, 'Authorization': 'Bearer ' + currentUser.token}
+  })
+  .then(function(r){ return r.json(); })
+  .then(function(data){
+    if(!Array.isArray(data) || data.length === 0){
+      conversations = [];
+      renderConversations();
+      return;
+    }
+    conversations = data;
+    renderConversations();
+  })
+  .catch(function(err){
+    console.error('加载对话失败:', err);
+    showToast('加载对话失败：' + err.message, 'error');
+  });
+}
+
+// 渲染对话
+function renderConversations(){
+  var container = document.getElementById('chatMessages');
+  if(conversations.length === 0){
+    container.innerHTML = '<div class="empty-state"><div class="empty-icon">💬</div><div class="empty-text">还没有对话，发送第一条消息开始交流吧</div></div>';
+    return;
+  }
+  container.innerHTML = '';
+  conversations.forEach(function(msg){
+    var div = document.createElement('div');
+    div.className = 'chat-msg ' + (msg.sender === 'admin' ? 'admin' : 'user');
+    var time = new Date(msg.created_at).toLocaleString('zh-CN');
+    var senderName = msg.sender === 'admin' ? '管理员' : (msg.name || '我');
+    div.innerHTML = 
+      '<div class="chat-bubble">' + escapeHtml(msg.content || '') + '</div>' +
+      '<div class="chat-meta">' + escapeHtml(senderName) + ' · ' + time + '</div>';
+    container.appendChild(div);
+  });
+  container.scrollTop = container.scrollHeight;
+}
+
+// 发送消息
+function sendMessage(){
+  if(!currentUser || !ticketId || conversationEnded) return;
+  var input = document.getElementById('chatInput');
+  var content = input.value.trim();
+  var btn = document.getElementById('sendBtn');
+  if(!content){ showToast('请输入消息内容', 'error'); return; }
+  
+  btn.disabled = true;
+  btn.textContent = '发送中...';
+  
+  fetch(SUPABASE_URL + '/rest/v1/conversations', {
+    method: 'POST',
+    headers: {
+      'apikey': ANON_KEY,
+      'Authorization': 'Bearer ' + currentUser.token,
+      'Content-Type': 'application/json',
+      'Prefer': 'return=minimal'
+    },
+    body: JSON.stringify({
+      ticket_id: ticketId,
+      user_id: currentUser.uid,
+      name: currentUser.name || '匿名',
+      content: content,
+      sender: isAdmin ? 'admin' : 'user',
+      created_at: new Date().toISOString()
+    })
+  })
+  .then(function(r){
+    if(r.ok || r.status === 201 || r.status === 204){
+      showToast('消息发送成功', 'success');
+      input.value = '';
+      setTimeout(function(){ loadConversations(); }, 500);
+    }else{
+      return r.text().then(function(e){ throw new Error(e || '发送失败'); });
+    }
+  })
+  .catch(function(err){
+    showToast('发送失败：' + err.message, 'error');
+  })
+  .finally(function(){
+    btn.disabled = false;
+    btn.textContent = '发送';
+  });
+}
+
+// 管理员结束对话
+function endConversation(){
+  if(!isAdmin || !ticketId) return;
+  if(!confirm('确定要结束这个对话吗？结束后用户将不能再发送消息。')) return;
+  
+  fetch(SUPABASE_URL + '/rest/v1/support_tickets?id=eq.' + ticketId, {
+    method: 'PATCH',
+    headers: {
+      'apikey': ANON_KEY,
+      'Authorization': 'Bearer ' + currentUser.token,
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({
+      conversation_ended: true,
+      status: 'closed',
+      processed_at: new Date().toISOString()
+    })
+  })
+  .then(function(r){
+    if(r.ok || r.status === 200 || r.status === 204){
+      showToast('对话已结束', 'success');
+      conversationEnded = true;
+      showConversationEnded();
+    }else{
+      return r.text().then(function(e){ throw new Error(e || '操作失败'); });
+    }
+  })
+  .catch(function(err){
+    showToast('操作失败：' + err.message, 'error');
+  });
+}
+
+// 返回
+function goBack(){
+  if(isAdmin){
+    location.href = 'admin-feedback.html';
+  }else{
+    location.href = 'contact-admin.html';
+  }
+}
+
+// 转义HTML
+function escapeHtml(str){
+  if(str == null) return '';
+  var div = document.createElement('div');
+  div.textContent = String(str);
+  return div.innerHTML;
+}
+
+// Toast提示
+function showToast(msg, type){
+  var toast = document.getElementById('toast');
+  toast.textContent = msg;
+  toast.className = 'toast ' + (type || 'info') + ' show';
+  setTimeout(function(){ toast.className = 'toast ' + (type || 'info'); }, 3000);
+}
+
+// 页面加载完成后初始化
+window.addEventListener('load', function(){
+  ticketId = getTicketIdFromUrl();
+  if(!checkLogin()) return;
+  setTimeout(loadTicketInfo, 300);
+});
+
+// 回车发送
+document.getElementById('chatInput').addEventListener('keydown', function(e){
+  if(e.key === 'Enter' && !e.shiftKey){
+    e.preventDefault();
+    sendMessage();
+  }
+});
+</script>
+</body>
+</html>
