@@ -52,7 +52,6 @@ var CONFIG = {
     conversation: "conversation.html",
     about: "about.html",
     gallery: "gallery.html",
-    videos: "videos.html",
     classwall: "classwall.html",
     developers: "developers.html",
     classmates: "classmates.html"
