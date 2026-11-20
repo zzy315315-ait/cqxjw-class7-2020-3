@@ -1,4 +1,4 @@
-﻿// ============================================================
+// ============================================================
 // 认证检测模块 - 后台自动检测登录状态 + 防直连检测
 // 使用方式：在页面中引入 <script src="auth-check.js"></script>
 // ============================================================
@@ -6,6 +6,12 @@
 var AuthCheck = (function(){
   var CHECK_INTERVAL = 30 * 1000; // 每30秒检测一次
   var checkTimer = null;
+
+  // 登录页完整地址：优先用 xauth.js 提供的 XAUTH.LOGIN_PAGE。
+  // 本仓库域名下没有 login.html，相对路径会 404，所以禁止相对跳转。
+  var LOGIN_PAGE = (typeof XAUTH !== 'undefined' && XAUTH && XAUTH.LOGIN_PAGE)
+    ? XAUTH.LOGIN_PAGE
+    : 'https://cqxjw-class7-2020.pages.dev/login.html';
 
   // 本地存储的直连记录
   function getDirectAccessRecords(){
@@ -38,8 +44,13 @@ var AuthCheck = (function(){
     return protectedPages.indexOf(page) >= 0;
   }
 
-  // 检查是否已登录
+  // 检查是否已登录（优先用 xauth.js 的统一判断，跨域进入时由 xauth.js 先落盘）
   function isLoggedIn(){
+    try{
+      if(typeof XAUTH !== 'undefined' && XAUTH && typeof XAUTH.isLoggedIn === 'function'){
+        return XAUTH.isLoggedIn();
+      }
+    }catch(e){}
     var hasSession = localStorage.getItem('sb_session') || localStorage.getItem('sb_admin') || sessionStorage.getItem('sb_session') || sessionStorage.getItem('sb_admin');
     var hasLoginFlag = sessionStorage.getItem('logged_in') || localStorage.getItem('logged_in');
     return !!(hasSession || hasLoginFlag);
@@ -50,7 +61,7 @@ var AuthCheck = (function(){
     if(localStorage.getItem('logged_in')){
       var exp = parseInt(localStorage.getItem('login_expire') || '0');
       if(Date.now() > exp){
-        // 过期了，清除所有登录状态`r`n        clearAllLoginState();
+        // 过期了；本文件没有 clearAllLoginState()，清除动作由各页面守卫负责，这里不调用
         return true;
       }
     }
@@ -120,7 +131,7 @@ var AuthCheck = (function(){
           '为了网站安全，请从登录页面正常登录后访问。<br>' +
           '<span style="color:#f87171;font-weight:600;">如果再次直接访问，您的IP将被封禁一天。</span>' +
         '</p>' +
-        '<button onclick="this.closest(\'div\').parentElement.remove();location.href=\'login.html\'" style="padding:12px 32px;border-radius:10px;background:linear-gradient(135deg,#4a90ff,#6b5bff);border:none;color:#fff;font-size:14px;font-weight:600;cursor:pointer;transition:all .25s;">前往登录页</button>' +
+        '<button onclick="this.closest(\'div\').parentElement.remove();location.href=\'' + LOGIN_PAGE + '\'" style="padding:12px 32px;border-radius:10px;background:linear-gradient(135deg,#4a90ff,#6b5bff);border:none;color:#fff;font-size:14px;font-weight:600;cursor:pointer;transition:all .25s;">前往登录页</button>' +
       '</div>';
     document.body.appendChild(overlay);
   }
@@ -148,14 +159,14 @@ var AuthCheck = (function(){
       // 登录过期，跳转到登录页
       if(isProtectedPage()){
         showToast('登录已过期，请重新登录', 'error');
-        setTimeout(function(){ location.href = 'login.html'; }, 1500);
+        setTimeout(function(){ location.href = LOGIN_PAGE; }, 1500);
       }
       return;
     }
 
     if(isProtectedPage() && !isLoggedIn()){
-      // 未登录，跳转到登录页
-      location.href = 'login.html';
+      // 未登录，跳转到登录页（完整地址，本域名没有 login.html）
+      location.href = LOGIN_PAGE;
     }
   }
 

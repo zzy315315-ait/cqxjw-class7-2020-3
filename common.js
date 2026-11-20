@@ -41,6 +41,11 @@ function showToast(msg, type){
 // 获取当前登录用户
 function getCurrentUser(){
   try{
+    // 跨域进入时身份由 xauth.js 先落盘，优先用统一模块
+    if(window.XAUTH && typeof window.XAUTH.getUser === 'function'){
+      var xu = window.XAUTH.getUser();
+      if(xu) return xu;
+    }
     var sess = JSON.parse(localStorage.getItem('sb_session') || sessionStorage.getItem('sb_session') || 'null');
     var adm = JSON.parse(localStorage.getItem('sb_admin') || 'null');
     return sess || adm;
@@ -79,7 +84,9 @@ function requireLogin(){
     }
   }
   if(!ok){
-    window.location.href = CONFIG ? CONFIG.PAGES.login : 'login.html';
+    window.location.href = (window.XAUTH && window.XAUTH.LOGIN_PAGE)
+      ? window.XAUTH.LOGIN_PAGE
+      : (CONFIG ? CONFIG.PAGES.login : 'https://cqxjw-class7-2020.pages.dev/login.html');
     return false;
   }
   return true;
@@ -91,7 +98,9 @@ function requireAdmin(){
   if(!isAdminUser()){
     showToast('需要管理员权限', 'error');
     setTimeout(function(){
-      window.location.href = CONFIG ? CONFIG.PAGES.login : 'login.html';
+      window.location.href = (window.XAUTH && window.XAUTH.LOGIN_PAGE)
+        ? window.XAUTH.LOGIN_PAGE
+        : (CONFIG ? CONFIG.PAGES.login : 'https://cqxjw-class7-2020.pages.dev/login.html');
     }, 1500);
     return false;
   }
@@ -144,7 +153,9 @@ function logout(){
   
   showToast('已退出登录，所有用户信息已清除', 'success');
   setTimeout(function(){
-    window.location.href = 'https://cqxjw-class7-2020.pages.dev/login.html';
+    window.location.href = (window.XAUTH && window.XAUTH.LOGIN_PAGE)
+      ? window.XAUTH.LOGIN_PAGE
+      : 'https://cqxjw-class7-2020.pages.dev/login.html';
   }, 800);
 }
 
@@ -158,8 +169,10 @@ function goBack(){
   }else{
     targetUrl = CONFIG ? CONFIG.PAGES.userHome : 'a3x7k2m9p4q8r3t6w1y5u0i2o4.html';
   }
-  // 跨域名跳转时带上加密的身份验证信息
-  if(targetUrl.indexOf('http') === 0 && typeof CrossDomainAuth !== 'undefined'){
+  // 跨域名跳转时带上加密的身份验证信息（优先用统一的 xauth.js）
+  if(targetUrl.indexOf('http') === 0 && window.XAUTH && typeof window.XAUTH.buildUrl === 'function'){
+    location.href = window.XAUTH.buildUrl(targetUrl);
+  }else if(targetUrl.indexOf('http') === 0 && typeof CrossDomainAuth !== 'undefined'){
     location.href = CrossDomainAuth.buildUrl(targetUrl);
   }else{
     location.href = targetUrl;
@@ -207,8 +220,10 @@ function disableSelection(){
 // 页面加载完成后自动执行
 document.addEventListener('DOMContentLoaded', function(){
   disableSelection();
-  // 自动检查URL中的auth参数，恢复跨域名传递的登录状态
-  CrossDomainAuth.receiveFromUrl();
+  // 跨域身份由 xauth.js 在脚本加载时同步接收；这里仅在缺少 xauth.js 时用旧模块兜底
+  if(!(window.XAUTH && typeof window.XAUTH.receive === 'function')){
+    CrossDomainAuth.receiveFromUrl();
+  }
 });
 
 // ============================================================

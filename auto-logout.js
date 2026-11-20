@@ -39,11 +39,13 @@
           localStorage.removeItem('is_admin');
           localStorage.removeItem('keep_login');
           
-          // 跳转到登录页
+          // 跳转到登录页（完整地址，本域名没有 login.html）
           if(window.location.pathname.indexOf('login.html') < 0 && 
              window.location.pathname.indexOf('index.html') < 0 &&
              window.location.pathname.indexOf('visitor.html') < 0){
-            window.location.href = 'login.html';
+            window.location.href = (window.XAUTH && window.XAUTH.LOGIN_PAGE)
+              ? window.XAUTH.LOGIN_PAGE
+              : 'https://cqxjw-class7-2020.pages.dev/login.html';
           }
         }
       }catch(e){}

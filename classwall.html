@@ -147,6 +147,7 @@
     .lightbox-next{right:12px}
   }
 </style>
+<script src="xauth.js"></script>
 <script src="bgm.js"></script>
 <script src="auth-check.js"></script>
 </head>
@@ -279,9 +280,11 @@ function goBack(){
 /* 显示当前账号状态 */
 (function(){
   try{
+    // 优先用 xauth.js：从其它域名跳进来时它已把身份写入本域 localStorage
+    var xuser = (window.XAUTH && typeof window.XAUTH.getUser === 'function') ? window.XAUTH.getUser() : null;
     var sess = JSON.parse(localStorage.getItem('sb_session')||'null');
     var adm = JSON.parse(localStorage.getItem('sb_admin')||'null');
-    var user = sess || adm;
+    var user = xuser || sess || adm;
     if(user && user.name){
       document.getElementById('navUsername').textContent = user.name;
       document.getElementById('navAvatar').textContent = user.name.charAt(0);

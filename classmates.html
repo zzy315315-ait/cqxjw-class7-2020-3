@@ -1,6 +1,7 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="zh-CN">
 <head>
+<script src="xauth.js"></script>
 <script src="direct-access-check.js"></script>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -139,6 +140,11 @@
   // 获取当前登录用户
   function getCurrentUser() {
     try {
+      // 优先用 xauth.js：从其它域名跳进来时它已把身份写入本域 localStorage
+      if (window.XAUTH && typeof window.XAUTH.getUser === 'function') {
+        var xu = window.XAUTH.getUser();
+        if (xu) return xu;
+      }
       var sess = JSON.parse(localStorage.getItem('sb_session') || sessionStorage.getItem('sb_session') || 'null');
       var adm = JSON.parse(localStorage.getItem('sb_admin') || 'null');
       return sess || adm;

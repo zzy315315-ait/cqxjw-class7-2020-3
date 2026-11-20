@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
@@ -6,6 +6,7 @@
 <link rel="icon" type="image/png" href="xiaohui.png">
 <title>留言墙 - 谢家湾学校2020级7班 · 毕业记忆</title>
 <link rel="stylesheet" href="common.css">
+<script src="xauth.js"></script>
 <script src="config.js"></script>
 <script src="common.js"></script>
 <style>
@@ -144,7 +145,8 @@
   .ctrl-btn{padding:8px 14px;border-radius:10px;background:rgba(20,24,44,0.85);backdrop-filter:blur(12px);border:1px solid rgba(255,255,255,0.1);color:#e8efff;font-size:12px;font-weight:600;cursor:pointer;transition:all .25s;white-space:nowrap}
   .ctrl-btn:hover{background:rgba(30,35,60,0.9);transform:translateX(3px);box-shadow:0 6px 20px rgba(0,0,0,0.3)}
 </style>
-<script src="config.js"></script>`r`n<script src="bgm.js"></script>`r`n<script src="auth-check.js"></script>
+<script src="bgm.js"></script>
+<script src="auth-check.js"></script>
 </head>
 <body>
 <div class="bg-fixed"></div><div class="bg-overlay"></div>
@@ -262,10 +264,12 @@ var currentUser = null;
 /* 显示当前账号状态 */
 (function(){
   try{
+    // 优先用 xauth.js：从其它域名跳进来时它已把身份写入本域 localStorage
+    var xuser = (window.XAUTH && typeof window.XAUTH.getUser === 'function') ? window.XAUTH.getUser() : null;
     // 同时检查localStorage和sessionStorage
     var sess = JSON.parse(localStorage.getItem('sb_session') || sessionStorage.getItem('sb_session') || 'null');
     var adm = JSON.parse(localStorage.getItem('sb_admin') || sessionStorage.getItem('sb_admin') || 'null');
-    var user = sess || adm;
+    var user = xuser || sess || adm;
     if(user && user.name){
       document.getElementById('navUsername').textContent = user.name;
       document.getElementById('navAvatar').textContent = user.name.charAt(0);
