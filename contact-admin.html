@@ -189,13 +189,14 @@ window.addEventListener('DOMContentLoaded', function(){
     else{ localStorage.removeItem('logged_in'); localStorage.removeItem('login_expire'); localStorage.removeItem('sb_session'); localStorage.removeItem('sb_admin'); }
   }
   if(sessionStorage.getItem('visitor_verified')) ok = true;
-  if(!ok){ location.href = 'https://cqxjw-class7-2020.pages.dev/login.html'; return; }
+  if(!ok){ location.href = XAUTH.LOGIN_PAGE; return; }
 
-  // 获取当前用户（同时检查localStorage和sessionStorage）
+  // 获取当前用户（优先用 xauth.js 的统一读取，跨域进入时它已落盘）
   try{
+    var xuser = (window.XAUTH && typeof window.XAUTH.getUser === 'function') ? window.XAUTH.getUser() : null;
     var sess = JSON.parse(localStorage.getItem('sb_session') || sessionStorage.getItem('sb_session') || 'null');
     var adm = JSON.parse(localStorage.getItem('sb_admin') || sessionStorage.getItem('sb_admin') || 'null');
-    currentUser = sess || adm;
+    currentUser = xuser || sess || adm;
     if(currentUser){
       document.getElementById('ticketName').value = currentUser.name || '';
       // 管理员判断用UID白名单，不依赖user_metadata.role
@@ -248,7 +249,7 @@ function submitTicket(){
   // 必须登录才能提交反馈
   if(!currentUser){
     showToast('请先登录后再提交反馈', 'error');
-    setTimeout(function(){ location.href = 'https://cqxjw-class7-2020.pages.dev/login.html'; }, 1500);
+    setTimeout(function(){ location.href = XAUTH.LOGIN_PAGE; }, 1500);
     return;
   }
 
@@ -301,7 +302,7 @@ function submitTicket(){
       setTimeout(function(){ switchTab('my'); }, 1200);
     }else if(r.status === 401){
       showToast('登录已过期，请重新登录', 'error');
-      setTimeout(function(){ location.href = 'https://cqxjw-class7-2020.pages.dev/login.html'; }, 1500);
+      setTimeout(function(){ location.href = XAUTH.LOGIN_PAGE; }, 1500);
     }else if(r.status === 403){
       showToast('没有权限提交反馈，请联系管理员', 'error');
     }else{
@@ -463,7 +464,7 @@ function deleteTicket(id){
       }, 300);
     }else if(r.status === 401){
       showToast("登录已过期，请重新登录", "error");
-      setTimeout(function(){ location.href = "https://cqxjw-class7-2020.pages.dev/login.html"; }, 1500);
+      setTimeout(function(){ location.href = XAUTH.LOGIN_PAGE; }, 1500);
     }else if(r.status === 403){
       showToast("没有权限删除这条反馈，只能删除自己发布的反馈", "error");
     }else if(r.status === 404){
@@ -523,11 +524,11 @@ function escapeHtml(str){
 
 function goBack(){
   if(sessionStorage.getItem('mode') === 'visitor'){
-    location.href = 'https://cqxjw-class7-2020-2.pages.dev/visitor.html';
+    XAUTH.go('https://cqxjw-class7-2020-2.pages.dev/visitor.html');
   }else if(isAdmin){
-    location.href = 'https://cqxjw-class7-2020-2.pages.dev/admin-main.html';
+    XAUTH.go('https://cqxjw-class7-2020-2.pages.dev/admin-main.html');
   }else{
-    location.href = 'https://cqxjw-class7-2020-2.pages.dev/a3x7k2m9p4q8r3t6w1y5u0i2o4.html';
+    XAUTH.go('https://cqxjw-class7-2020-2.pages.dev/a3x7k2m9p4q8r3t6w1y5u0i2o4.html');
   }
 }
 
@@ -584,7 +585,7 @@ function saveEditTicket(){
       }, 500);
     }else if(r.status === 401){
       showToast('登录已过期，请重新登录', 'error');
-      setTimeout(function(){ location.href = 'https://cqxjw-class7-2020.pages.dev/login.html'; }, 1500);
+      setTimeout(function(){ location.href = XAUTH.LOGIN_PAGE; }, 1500);
     }else if(r.status === 403){
       showToast('没有权限修改这条反馈', 'error');
     }else{

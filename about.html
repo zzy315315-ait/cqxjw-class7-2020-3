@@ -81,10 +81,10 @@
       document.getElementById('navAvatar').style.background = 'linear-gradient(135deg,#6b7280,#9ca3af)';
     }else{
       // 未登录，跳转到登录页
-      window.location.href = 'https://cqxjw-class7-2020.pages.dev/login.html';
+      window.location.href = XAUTH.LOGIN_PAGE;
     }
   }catch(e){
-    window.location.href = 'https://cqxjw-class7-2020.pages.dev/login.html';
+    window.location.href = XAUTH.LOGIN_PAGE;
   }
 })();
 
@@ -92,15 +92,15 @@
 function goBack(){
   // 管理员返回管理员主页
   if(localStorage.getItem('sb_admin') || sessionStorage.getItem('sb_admin')){
-    location.href = 'https://cqxjw-class7-2020-2.pages.dev/admin-main.html';
+    XAUTH.go('https://cqxjw-class7-2020-2.pages.dev/admin-main.html');
   }
   // 访客返回访客主页
   else if(sessionStorage.getItem('mode') === 'visitor' || sessionStorage.getItem('visitor_verified')){
-    location.href = 'https://cqxjw-class7-2020-2.pages.dev/visitor.html';
+    XAUTH.go('https://cqxjw-class7-2020-2.pages.dev/visitor.html');
   }
   // 普通用户返回用户主页
   else{
-    location.href = 'https://cqxjw-class7-2020-2.pages.dev/a3x7k2m9p4q8r3t6w1y5u0i2o4.html';
+    XAUTH.go('https://cqxjw-class7-2020-2.pages.dev/a3x7k2m9p4q8r3t6w1y5u0i2o4.html');
   }
 }
 /* 防直达检测：必须有登录标记+session，或访客验证标记，或管理员session */
@@ -116,7 +116,7 @@ function goBack(){
   if(sessionStorage.getItem('visitor_verified')) ok = true;
   // 管理员session也算已登录
   if(localStorage.getItem('sb_admin') || sessionStorage.getItem('sb_admin')) ok = true;
-  if(!ok) location.href = 'https://cqxjw-class7-2020.pages.dev/login.html';
+  if(!ok) location.href = XAUTH.LOGIN_PAGE;
 })();
 </script>
 </body>

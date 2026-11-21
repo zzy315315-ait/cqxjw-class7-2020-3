@@ -175,7 +175,7 @@
 </div>
 
 <!-- 右上角管理员设置按钮 -->
-<button class="admin-settings-btn" id="adminSettingsBtn" onclick="location.href='https://cqxjw-class7-2020-4.pages.dev/admin-settings.html'">⚙️</button>
+<button class="admin-settings-btn" id="adminSettingsBtn" onclick="XAUTH.go('https://cqxjw-class7-2020-4.pages.dev/admin-settings.html')">⚙️</button>
 
 <!-- 右下角发布按钮 -->
 <button class="fab-post" id="fabPost" onclick="openPostModal()">+</button>
@@ -279,10 +279,10 @@ var currentUser = null;
       document.getElementById('navAvatar').style.background = 'linear-gradient(135deg,#6b7280,#9ca3af)';
     }else{
       // 未登录，跳转到登录页
-      window.location.href = 'https://cqxjw-class7-2020.pages.dev/login.html';
+      window.location.href = XAUTH.LOGIN_PAGE;
     }
   }catch(e){
-    window.location.href = 'https://cqxjw-class7-2020.pages.dev/login.html';
+    window.location.href = XAUTH.LOGIN_PAGE;
   }
 })();
 
@@ -297,11 +297,13 @@ var currentUser = null;
     else{ localStorage.removeItem('logged_in'); localStorage.removeItem('login_expire'); localStorage.removeItem('sb_session'); localStorage.removeItem('sb_admin'); }
   }
   if(sessionStorage.getItem('visitor_verified')) ok = true;
-  if(!ok){ location.href = 'https://cqxjw-class7-2020.pages.dev/login.html'; return; }
+  if(!ok){ location.href = XAUTH.LOGIN_PAGE; return; }
   try{
+    // 优先用 xauth.js 的统一读取
+    var xuser = (window.XAUTH && typeof window.XAUTH.getUser === 'function') ? window.XAUTH.getUser() : null;
     var sess = JSON.parse(localStorage.getItem('sb_session')||'null');
     var adm = JSON.parse(localStorage.getItem('sb_admin')||'null');
-    currentUser = sess || adm;
+    currentUser = xuser || sess || adm;
     if(currentUser){
       document.getElementById('msgName').value = currentUser.name || '';
       // 判断是否管理员（用UID白名单，不依赖role）
@@ -319,11 +321,11 @@ var currentUser = null;
 
 function goBack(){
   if(sessionStorage.getItem('mode') === 'visitor'){
-    location.href = 'https://cqxjw-class7-2020-2.pages.dev/visitor.html';
+    XAUTH.go('https://cqxjw-class7-2020-2.pages.dev/visitor.html');
   }else if(isAdmin){
-    location.href = 'https://cqxjw-class7-2020-2.pages.dev/admin-main.html';
+    XAUTH.go('https://cqxjw-class7-2020-2.pages.dev/admin-main.html');
   }else{
-    location.href = 'https://cqxjw-class7-2020-2.pages.dev/a3x7k2m9p4q8r3t6w1y5u0i2o4.html';
+    XAUTH.go('https://cqxjw-class7-2020-2.pages.dev/a3x7k2m9p4q8r3t6w1y5u0i2o4.html');
   }
 }
 
@@ -506,7 +508,7 @@ function postMessage(){
     }else if(r.status === 401){
       // token过期，跳回登录页
       showToast('登录已过期，请重新登录', 'error');
-      setTimeout(function(){ location.href = 'https://cqxjw-class7-2020.pages.dev/login.html'; }, 1500);
+      setTimeout(function(){ location.href = XAUTH.LOGIN_PAGE; }, 1500);
     }else{
       return r.text().then(function(e){ throw new Error(e || '发布失败'); });
     }
@@ -554,7 +556,7 @@ function deleteMessage(id, msgUid, el){
       setTimeout(function(){ loadMessages(); }, 300);
     }else if(r.status === 401){
       showToast('登录已过期，请重新登录', 'error');
-      setTimeout(function(){ location.href = 'https://cqxjw-class7-2020.pages.dev/login.html'; }, 1500);
+      setTimeout(function(){ location.href = XAUTH.LOGIN_PAGE; }, 1500);
     }else{
       return r.text().then(function(e){ throw new Error(e || '删除失败，可能权限不足'); });
     }
@@ -766,7 +768,7 @@ function postMessageModal(){
       loadMessages();
     }else if(r.status === 401){
       showToast('登录已过期，请重新登录', 'error');
-      setTimeout(function(){ location.href = 'https://cqxjw-class7-2020.pages.dev/login.html'; }, 1500);
+      setTimeout(function(){ location.href = XAUTH.LOGIN_PAGE; }, 1500);
     }else{
       showToast('发布失败', 'error');
     }
@@ -823,7 +825,7 @@ function saveEditMessage(){
       setTimeout(function(){ loadMessages(); }, 500);
     }else if(r.status === 401){
       showToast('登录已过期，请重新登录', 'error');
-      setTimeout(function(){ location.href = 'https://cqxjw-class7-2020.pages.dev/login.html'; }, 1500);
+      setTimeout(function(){ location.href = XAUTH.LOGIN_PAGE; }, 1500);
     }else if(r.status === 403){
       showToast('没有权限修改这条留言', 'error');
     }else{

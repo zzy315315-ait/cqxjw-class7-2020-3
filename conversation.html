@@ -108,18 +108,20 @@ function getTicketIdFromUrl(){
 // 检查用户是否登录
 function checkLogin(){
   try{
+    // 优先用 xauth.js：跨域进入时它已把身份写入本域 localStorage
+    var xuser = (window.XAUTH && typeof window.XAUTH.getUser === 'function') ? window.XAUTH.getUser() : null;
     var sess = JSON.parse(localStorage.getItem('sb_session') || sessionStorage.getItem('sb_session') || 'null');
     var adm = JSON.parse(localStorage.getItem('sb_admin') || sessionStorage.getItem('sb_admin') || 'null');
-    currentUser = sess || adm;
+    currentUser = xuser || sess || adm;
     isAdmin = !!(adm && adm.uid) || (currentUser && (currentUser.role === 'admin' || currentUser.role === 'super_admin'));
     if(!currentUser || !currentUser.token){
       showToast('请先登录', 'error');
-      setTimeout(function(){ location.href = 'https://cqxjw-class7-2020.pages.dev/login.html'; }, 1500);
+      setTimeout(function(){ location.href = XAUTH.LOGIN_PAGE; }, 1500);
       return false;
     }
     return true;
   }catch(e){
-    location.href = 'https://cqxjw-class7-2020.pages.dev/login.html';
+    location.href = XAUTH.LOGIN_PAGE;
     return false;
   }
 }
@@ -320,7 +322,7 @@ function endConversation(){
 // 返回
 function goBack(){
   if(isAdmin){
-    location.href = 'https://cqxjw-class7-2020-4.pages.dev/admin-feedback.html';
+    XAUTH.go('https://cqxjw-class7-2020-4.pages.dev/admin-feedback.html');
   }else{
     location.href = 'contact-admin.html';
   }

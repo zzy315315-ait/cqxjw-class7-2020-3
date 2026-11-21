@@ -223,7 +223,7 @@ images.forEach(function(fname, idx){
   div.onclick = function(){openLightbox(idx)};
   div.innerHTML =
     '<div class="num">' + (idx+1) + '</div>' +
-    '<img src='rudui/' + fname + '" alt="入队照片' + (idx+1) + '" loading="lazy">' +
+    '<img src="rudui/' + fname + '" alt="入队照片' + (idx+1) + '" loading="lazy">' +
     '<div class="overlay"><span class="caption">入队纪念 · 第' + (idx+1) + '张</span></div>';
   gallery.appendChild(div);
 });
@@ -272,9 +272,9 @@ document.addEventListener('keydown', function(e){
 /* 返回：根据模式跳转 */
 function goBack(){
   if(sessionStorage.getItem('mode') === 'visitor'){
-    location.href = 'https://cqxjw-class7-2020-2.pages.dev/visitor.html';
+    XAUTH.go('https://cqxjw-class7-2020-2.pages.dev/visitor.html');
   }else{
-    location.href = 'https://cqxjw-class7-2020-2.pages.dev/a3x7k2m9p4q8r3t6w1y5u0i2o4.html';
+    XAUTH.go('https://cqxjw-class7-2020-2.pages.dev/a3x7k2m9p4q8r3t6w1y5u0i2o4.html');
   }
 }
 /* 显示当前账号状态 */
@@ -307,7 +307,7 @@ function goBack(){
     else{ localStorage.removeItem('logged_in'); localStorage.removeItem('login_expire'); localStorage.removeItem('sb_session'); localStorage.removeItem('sb_admin'); }
   }
   if(sessionStorage.getItem('visitor_verified')) ok = true;
-  if(!ok) location.href = 'https://cqxjw-class7-2020.pages.dev/login.html';
+  if(!ok) location.href = XAUTH.LOGIN_PAGE;
 })();
 </script>
 </body>
