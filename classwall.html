@@ -150,6 +150,7 @@
 <script src="xauth.js"></script>
 <script src="bgm.js"></script>
 <script src="auth-check.js"></script>
+<link rel="stylesheet" href="perf.css">
 </head>
 <body>
 
@@ -223,7 +224,7 @@ images.forEach(function(fname, idx){
   div.onclick = function(){openLightbox(idx)};
   div.innerHTML =
     '<div class="num">' + (idx+1) + '</div>' +
-    '<img src="rudui/' + fname + '" alt="入队照片' + (idx+1) + '" loading="lazy">' +
+    '<img src="rudui-thumb/' + fname + '" alt="入队照片' + (idx+1) + '" loading="lazy">' +
     '<div class="overlay"><span class="caption">入队纪念 · 第' + (idx+1) + '张</span></div>';
   gallery.appendChild(div);
 });
@@ -310,6 +311,7 @@ function goBack(){
   if(!ok) location.href = XAUTH.LOGIN_PAGE;
 })();
 </script>
+<script src="perf.js"></script>
 </body>
 </html>
 

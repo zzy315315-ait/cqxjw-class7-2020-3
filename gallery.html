@@ -52,6 +52,7 @@
 <script src="xauth.js"></script>
 <script src="bgm.js"></script>
 <script src="auth-check.js"></script>
+<link rel="stylesheet" href="perf.css">
 </head>
 <body>
 <div class="bg-fixed"></div><div class="bg-overlay"></div>
@@ -93,7 +94,7 @@ var images = [
   {src:'ppt_images/slide4_img3.jpg', caption:'校园时光'},
   {src:'ppt_images/slide5_img4.jpg', caption:'班级活动'},
   {src:'ppt_images/slide6_img5.jpg', caption:'新年照片'},
-  {src:'ppt_images/slide7_img6.png', caption:'运动会'},
+  {src:'ppt_images/slide7_img6.jpg', caption:'运动会'},
   {src:'photos/photo1.jpg', caption:'班级照片1'},
   {src:'photos/photo2.jpg', caption:'班级照片2'},
   {src:'photos/photo3.jpg', caption:'班级照片3'},
@@ -105,11 +106,13 @@ var images = [
 ];
 var gallery = document.getElementById('gallery');
 var currentImgIdx = 0;
+/* 性能优化：宫格用缩略图，点开看大图用原图 */
+images.forEach(function(it){ if(it.src.indexOf('photos/') === 0){ it.thumb = it.src.replace('photos/', 'photos/thumb/'); } });
 images.forEach(function(item, idx){
   var div = document.createElement('div');
   div.className = 'gallery-item';
   div.onclick = function(){ openImgViewer(idx); };
-  div.innerHTML = '<img src="'+item.src+'" alt="'+item.caption+'" loading="lazy" onerror="this.parentElement.style.display=\'none\'"><div class="caption">'+item.caption+'</div>';
+  div.innerHTML = '<img src="'+(item.thumb||item.src)+'" alt="'+item.caption+'" loading="lazy" onerror="this.parentElement.style.display=\'none\'"><div class="caption">'+item.caption+'</div>';
   gallery.appendChild(div);
 });
 
@@ -205,6 +208,7 @@ function goBack(){
   if(!ok) location.href = XAUTH.LOGIN_PAGE;
 })();
 </script>
+<script src="perf.js"></script>
 </body>
 </html>
 
