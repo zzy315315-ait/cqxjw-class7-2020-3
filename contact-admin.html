@@ -134,7 +134,7 @@
       </div>
       <div class="form-group">
         <label class="form-label">你的名字</label>
-        <input type="text" class="form-input" id="ticketName" placeholder="请输入你的名字（匿名可填"匿名"）">
+        <input type="text" class="form-input" id="ticketName" readonly placeholder="提交后显示账号真实姓名" style="color:#9fb2d8;cursor:not-allowed">
       </div>
       <div class="form-group">
         <label class="form-label">详细描述</label>
@@ -199,7 +199,21 @@ window.addEventListener('DOMContentLoaded', function(){
     var adm = JSON.parse(localStorage.getItem('sb_admin') || sessionStorage.getItem('sb_admin') || 'null');
     currentUser = xuser || sess || adm;
     if(currentUser){
-      document.getElementById('ticketName').value = currentUser.name || '';
+      var nameInput = document.getElementById('ticketName');
+      nameInput.value = currentUser.name || '';
+      nameInput.readOnly = true;
+      if(!currentUser.name && currentUser.uid){
+        fetch(SUPABASE_URL + '/rest/v1/student_profiles?user_id=eq.' + currentUser.uid + '&select=name,student_id', {
+          headers: {'apikey': ANON_KEY, 'Authorization': 'Bearer ' + (currentUser.token || ANON_KEY)}
+        }).then(function(r){ return r.json(); }).then(function(data){
+          var p = (data && data.length > 0) ? data[0] : null;
+          if(p && p.name){
+            currentUser.name = p.name;
+            if(p.student_id) currentUser.student_id = p.student_id;
+            nameInput.value = p.name;
+          }
+        }).catch(function(){});
+      }
       // 管理员判断用UID白名单，不依赖user_metadata.role
       var ADMIN_UIDS = ["919f3af0-801d-4d7b-87b4-03bedc9d2896", "6522e17f-14ea-4f1f-b20d-10457d598fef"];
       if(ADMIN_UIDS.indexOf(currentUser.uid) >= 0){
@@ -235,7 +249,7 @@ function switchTab(tab){
 }
 
 function submitTicket(){
-  var name = document.getElementById('ticketName').value.trim();
+  var name = currentUser ? currentUser.name : '';
   var msg = document.getElementById('ticketMsg').value.trim();
   var btn = document.getElementById('submitBtn');
 
@@ -262,7 +276,7 @@ function submitTicket(){
     return;
   }
 
-  if(!name){ showToast('请输入你的名字', 'error'); return; }
+  if(!name){ showToast('账号资料加载中，请稍后再试', 'error'); return; }
   if(!msg){ showToast('请输入详细描述', 'error'); return; }
 
   btn.disabled = true;

@@ -44,6 +44,7 @@
   .role-tag.student{background:rgba(59,130,246,0.15);color:#7bc0ff}
   .role-tag.teacher{background:rgba(245,158,11,0.15);color:#fbbf24}
   .role-tag.admin{background:rgba(139,92,246,0.15);color:#c4b5fd}
+  .role-tag.support{background:rgba(250,204,21,0.18);color:#facc15;border:1px solid rgba(250,204,21,0.35)}
   .student-bio{font-size:13px;color:#a0aec0;line-height:1.7;background:rgba(0,0,0,0.2);border-radius:10px;padding:12px;margin-top:8px;min-height:40px}
   .student-bio.empty{color:#5a6890;font-style:italic}
   .edit-bio-btn{margin-top:10px;padding:6px 14px;border-radius:8px;background:rgba(91,168,255,0.1);border:1px solid rgba(91,168,255,0.3);color:#7bc0ff;font-size:12px;cursor:pointer;transition:all .25s;display:none}
@@ -249,6 +250,7 @@
       }
       console.log('isSelf检查：currentUser.uid=' + (currentUser ? currentUser.uid : 'null') + ', s.user_id=' + s.user_id + ', isSelf=' + isSelf);
       var avatarClass = role === 'teacher' ? 'teacher' : (role === 'admin' ? 'admin' : (role === 'other' ? 'other' : ''));
+      var isSupport = String(s.student_id) === '22';
       var roleText = role === 'teacher' ? '老师' : (role === 'admin' ? '管理员' : (role === 'unrestricted' ? '不受管控' : (role === 'other' ? '其他用户' : '同学')));
       var bioText = s.bio && s.bio.trim() ? escapeHtml(s.bio) : '这个人很懒，什么都没写~';
       var bioClass = s.bio && s.bio.trim() ? '' : 'empty';
@@ -271,6 +273,7 @@
             '<div class="student-name">' + displayName + '</div>' +
             '<div class="student-meta">' +
               '<span class="role-tag ' + role + '">' + roleText + '</span>' +
+              (isSupport ? '<span class="role-tag support">支持</span>' : '') +
               (sidText ? '<span>' + sidText + '</span>' : '') +
             '</div>' +
           '</div>' +

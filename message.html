@@ -189,7 +189,7 @@
     <div class="admin-options" id="adminOptionsModal" style="display:none;gap:10px;margin-bottom:12px;align-items:center;">
       <label style="font-size:13px;color:#9aa8d0;display:flex;align-items:center;gap:6px;cursor:pointer;"><input type="checkbox" id="isAnnouncementModal"> 设为公告（置顶）</label>
     </div>
-    <input type="text" class="form-input" id="msgNameModal" placeholder="你的名字（可自定义昵称）" maxlength="20">
+    <input type="text" class="form-input" id="msgNameModal" readonly placeholder="显示账号真实姓名" style="color:#9fb2d8;cursor:not-allowed" maxlength="20">
     <textarea class="form-textarea" id="msgContentModal" placeholder="想说点什么？（最多500字）" maxlength="500" style="min-height:120px;"></textarea>
     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
       <span style="font-size:12px;color:#5a6890;" id="charCountModal">0 / 500</span>
@@ -225,7 +225,7 @@
       <label><input type="checkbox" id="isAnnouncement"> 设为公告（置顶）</label>
     </div>
     <div class="form-row">
-      <input type="text" class="form-input" id="msgName" placeholder="你的名字（可自定义昵称）" maxlength="20">
+      <input type="text" class="form-input" id="msgName" readonly placeholder="显示账号真实姓名" style="color:#9fb2d8;cursor:not-allowed" maxlength="20">
     </div>
     <textarea class="form-textarea" id="msgContent" placeholder="想说点什么？（最多500字）" maxlength="500"></textarea>
     <div class="form-bottom">
@@ -307,7 +307,22 @@ var currentUser = null;
     var adm = JSON.parse(localStorage.getItem('sb_admin')||'null');
     currentUser = xuser || sess || adm;
     if(currentUser){
-      document.getElementById('msgName').value = currentUser.name || '';
+      var nm = document.getElementById('msgName');
+      nm.value = currentUser.name || '';
+      nm.readOnly = true;
+      if(!currentUser.name && currentUser.uid){
+        fetch(SUPABASE_URL + '/rest/v1/student_profiles?user_id=eq.' + currentUser.uid + '&select=name,student_id', {
+          headers: {'apikey': ANON_KEY, 'Authorization': 'Bearer ' + (currentUser.token || ANON_KEY)}
+        }).then(function(r){ return r.json(); }).then(function(data){
+          var p = (data && data.length > 0) ? data[0] : null;
+          if(p && p.name){
+            currentUser.name = p.name;
+            if(p.student_id) currentUser.student_id = p.student_id;
+            var a = document.getElementById('msgName'); if(a) a.value = p.name;
+            var b = document.getElementById('msgNameModal'); if(b) b.value = p.name;
+          }
+        }).catch(function(){});
+      }
       // 判断是否管理员（用UID白名单，不依赖role）
       if(currentUser.uid && ADMIN_UIDS.indexOf(currentUser.uid.toLowerCase()) >= 0) isAdmin = true;
       if(sessionStorage.getItem('is_admin') || localStorage.getItem('is_admin')) isAdmin = true;
@@ -466,11 +481,11 @@ function getRole(msg){
 /* 发布留言 */
 function postMessage(){
   if(isVisitor){ showToast('访客仅可浏览留言，登录后才能发布', 'error'); return; }
-  var name = document.getElementById('msgName').value.trim();
+  var name = currentUser ? currentUser.name : '';
   var content = document.getElementById('msgContent').value.trim();
   var btn = document.getElementById('submitBtn');
 
-  if(!name){ showToast('请输入名字', 'error'); return; }
+  if(!name){ showToast('账号资料加载中，请稍后再试', 'error'); return; }
   if(name.length > 30){ showToast('名字最多30个字符', 'error'); return; }
   // 检测乱码：只允许中文、英文、数字、常见标点
   var validNameRegex = /^[\u4e00-\u9fa5a-zA-Z0-9\s\-\_\.、，。！？！？]+$/;
@@ -739,7 +754,9 @@ function openPostModal(){
   controlBtns.forEach(function(btn){ btn.style.pointerEvents = 'none'; });
   // 预填名字
   if(currentUser && currentUser.name){
-    document.getElementById('msgNameModal').value = currentUser.name;
+    var nmm = document.getElementById('msgNameModal');
+    nmm.value = currentUser.name;
+    nmm.readOnly = true;
   }
   setTimeout(function(){ document.getElementById('msgContentModal').focus(); }, 100);
 }
@@ -756,10 +773,10 @@ function closePostModal(){
 
 function postMessageModal(){
   if(isVisitor){ showToast('访客仅可浏览留言，登录后才能发布', 'error'); return; }
-  var name = document.getElementById('msgNameModal').value.trim();
+  var name = currentUser ? currentUser.name : '';
   var content = document.getElementById('msgContentModal').value.trim();
   var isAnn = document.getElementById('isAnnouncementModal').checked;
-  if(!name){ showToast('请输入名字', 'error'); return; }
+  if(!name){ showToast('账号资料加载中，请稍后再试', 'error'); return; }
   if(name.length > 30){ showToast('名字最多30个字符', 'error'); return; }
   var validNameRegex = /^[\u4e00-\u9fa5a-zA-Z0-9\s\-\_\.、，。！？]+$/;
   if(!validNameRegex.test(name)){ showToast('名字包含非法字符，请使用中文、英文或数字', 'error'); return; }
