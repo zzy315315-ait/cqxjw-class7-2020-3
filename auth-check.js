@@ -59,7 +59,10 @@ var AuthCheck = (function(){
   // 检查登录是否过期
   function isLoginExpired(){
     if(localStorage.getItem('logged_in')){
-      var exp = parseInt(localStorage.getItem('login_expire') || '0');
+      var expRaw = localStorage.getItem('login_expire');
+      if(!expRaw) return false;
+      var exp = parseInt(expRaw);
+      if(isNaN(exp) || exp <= 0) return false;
       if(Date.now() > exp){
         // 过期了；本文件没有 clearAllLoginState()，清除动作由各页面守卫负责，这里不调用
         return true;
