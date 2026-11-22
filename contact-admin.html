@@ -509,12 +509,30 @@ function submitReply(id){
   fetch(SUPABASE_URL + '/rest/v1/support_tickets?id=eq.' + id, {
     method: 'PATCH',
     headers: {'apikey': ANON_KEY, 'Authorization': 'Bearer ' + token, 'Content-Type': 'application/json'},
-    body: JSON.stringify({admin_reply: reply, status: 'processed', processed_at: new Date().toISOString()})
+    body: JSON.stringify({admin_reply: reply, status: 'processed', processed_at: new Date().toISOString(), replied_at: new Date().toISOString()})
   })
   .then(function(r){
-    if(r.ok){ showToast('回复已发送', 'success'); loadAllTickets(); }
+    if(r.ok){ notifyTicketUser(id, reply); showToast('回复已发送', 'success'); loadAllTickets(); }
     else showToast('操作失败', 'error');
   });
+}
+
+function notifyTicketUser(ticketId, reply){
+  if(!currentUser || !currentUser.token) return;
+  fetch(SUPABASE_URL + '/rest/v1/support_tickets?id=eq.' + ticketId + '&select=user_id,name', {
+    headers: {'apikey': ANON_KEY, 'Authorization': 'Bearer ' + currentUser.token}
+  })
+  .then(function(r){ return r.json(); })
+  .then(function(list){
+    if(!list || !list.length) return;
+    var t = list[0];
+    if(!t.user_id) return;
+    fetch(SUPABASE_URL + '/rest/v1/user_messages', {
+      method: 'POST',
+      headers: {'apikey': ANON_KEY, 'Authorization': 'Bearer ' + currentUser.token, 'Content-Type': 'application/json', 'Prefer': 'return=minimal'},
+      body: JSON.stringify({user_id: t.user_id, title: '管理员回复了你的反馈', content: reply, msg_type: 'admin', ticket_id: ticketId, sender_name: '管理员', is_read: false})
+    }).catch(function(){});
+  }).catch(function(){});
 }
 
 function escapeHtml(str){

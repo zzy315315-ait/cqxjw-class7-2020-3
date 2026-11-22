@@ -260,6 +260,7 @@ var DEV_SIDS = CONFIG.DEV_SIDS;
 var TEACHER_EMAIL = CONFIG.TEACHER_EMAIL;
 
 var isAdmin = false;
+var isVisitor = false;
 var currentUser = null;
 
 /* 显示当前账号状态 */
@@ -312,6 +313,12 @@ var currentUser = null;
       if(sessionStorage.getItem('is_admin') || localStorage.getItem('is_admin')) isAdmin = true;
     }
   }catch(e){}
+  var visitorMode = sessionStorage.getItem('mode') === 'visitor' || sessionStorage.getItem('visitor_verified');
+  if(visitorMode && !currentUser){ isVisitor = true; }
+  if(isVisitor){
+    var pf = document.querySelector('.post-form'); if(pf) pf.style.display = 'none';
+    var fab = document.getElementById('fabPost'); if(fab) fab.style.display = 'none';
+  }
   if(isAdmin){
     document.body.classList.add('is-admin');
     document.getElementById('adminOptions').classList.add('show');
@@ -458,6 +465,7 @@ function getRole(msg){
 
 /* 发布留言 */
 function postMessage(){
+  if(isVisitor){ showToast('访客仅可浏览留言，登录后才能发布', 'error'); return; }
   var name = document.getElementById('msgName').value.trim();
   var content = document.getElementById('msgContent').value.trim();
   var btn = document.getElementById('submitBtn');
@@ -723,6 +731,7 @@ function renderFloatingMessages(){
 
 /* ===== 发布弹窗 ===== */
 function openPostModal(){
+  if(isVisitor){ showToast('访客仅可浏览留言，登录后才能发布', 'error'); return; }
   document.getElementById('postModal').classList.add('show');
   document.body.style.overflow = 'hidden';
   // 禁用背景页面的点击事件
@@ -746,6 +755,7 @@ function closePostModal(){
 }
 
 function postMessageModal(){
+  if(isVisitor){ showToast('访客仅可浏览留言，登录后才能发布', 'error'); return; }
   var name = document.getElementById('msgNameModal').value.trim();
   var content = document.getElementById('msgContentModal').value.trim();
   var isAnn = document.getElementById('isAnnouncementModal').checked;

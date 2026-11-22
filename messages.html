@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<script src="xauth.js"></script>
+<script src="direct-access-check.js"></script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="icon" type="image/png" href="xiaohui.png">
+<title>消息中心 - 谢家湾学校2020级7班 · 毕业记忆</title>
+<style>
+  *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;user-select:none;-webkit-user-select:none}
+  img{-webkit-user-drag:none;user-drag:none}
+  body{font-family:"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif;background:#050810;color:#e0e6f0;min-height:100vh}
+  .bg-fixed{position:fixed;inset:0;z-index:-2;background:url('starbg.jpg') center/cover no-repeat;filter:brightness(0.3) saturate(1.2)}
+  .bg-overlay{position:fixed;inset:0;z-index:-1;background:linear-gradient(180deg,rgba(5,8,16,0.75),rgba(5,8,16,0.92))}
+  .navbar{position:fixed;top:0;left:0;right:0;z-index:100;display:flex;align-items:center;justify-content:space-between;padding:10px 24px;background:rgba(10,14,28,0.8);backdrop-filter:blur(20px);border-bottom:1px solid rgba(255,255,255,0.08)}
+  .nav-brand{display:flex;align-items:center;gap:12px;cursor:pointer}
+  .nav-brand-title{font-size:14px;font-weight:700;color:#e8efff}
+  .nav-back{padding:8px 18px;border-radius:10px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);color:#c8d4f0;font-size:13px;cursor:pointer;transition:all .25s}
+  .nav-back:hover{background:rgba(91,168,255,0.15);border-color:rgba(91,168,255,0.3);color:#fff}
+  .container{padding:100px 24px 60px;max-width:720px;margin:0 auto}
+  .page-header{text-align:center;margin-bottom:28px}
+  .page-icon{font-size:44px;margin-bottom:12px;opacity:.85}
+  .page-title{font-size:clamp(24px,5vw,32px);font-weight:800;letter-spacing:2px;background:linear-gradient(135deg,#fff,#7bc0ff,#a07bff);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:8px}
+  .page-desc{font-size:13px;color:#7a8ab5;line-height:1.8}
+  .tabs{display:flex;gap:8px;margin-bottom:24px;background:rgba(20,24,44,0.5);padding:6px;border-radius:14px;border:1px solid rgba(255,255,255,0.08)}
+  .tab{flex:1;padding:10px;text-align:center;border-radius:10px;font-size:13px;font-weight:600;color:#7a8ab5;cursor:pointer;transition:all .25s}
+  .tab.active{background:linear-gradient(135deg,rgba(59,130,246,0.2),rgba(160,123,255,0.2));color:#fff;border:1px solid rgba(91,168,255,0.3)}
+  .msg-list{display:flex;flex-direction:column;gap:14px}
+  .msg-item{background:rgba(20,24,44,0.7);backdrop-filter:blur(24px);border:1px solid rgba(255,255,255,0.1);border-radius:16px;padding:18px 20px;transition:all .25s;position:relative}
+  .msg-item.unread{border-color:rgba(91,168,255,0.35);background:rgba(91,168,255,0.06)}
+  .msg-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;gap:10px}
+  .msg-meta{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+  .msg-icon{font-size:18px}
+  .msg-title{font-size:14px;font-weight:600;color:#e8efff}
+  .msg-badge{padding:3px 10px;border-radius:6px;font-size:11px;font-weight:600}
+  .badge-admin{background:rgba(91,168,255,0.15);color:#60a5fa;border:1px solid rgba(91,168,255,0.3)}
+  .badge-system{background:rgba(160,123,255,0.15);color:#a78bfa;border:1px solid rgba(160,123,255,0.3)}
+  .dot{width:8px;height:8px;border-radius:50%;background:#3b82f6;box-shadow:0 0 8px #3b82f6}
+  .msg-content{font-size:13px;color:#b8c4e0;line-height:1.7;white-space:pre-wrap;word-break:break-word}
+  .msg-time{font-size:11px;color:#5a6890;margin-top:8px}
+  .msg-actions{margin-top:12px;display:flex;gap:8px;flex-wrap:wrap}
+  .btn-sm{padding:8px 14px;border-radius:10px;font-size:12px;font-weight:600;cursor:pointer;border:1px solid transparent;transition:all .2s}
+  .btn-chat{background:rgba(91,168,255,0.18);border-color:rgba(91,168,255,0.35);color:#7bc0ff}
+  .btn-chat:hover{background:rgba(91,168,255,0.28)}
+  .empty-state{text-align:center;padding:50px 20px;color:#7a8ab5}
+  .empty-icon{font-size:44px;margin-bottom:12px;opacity:.7}
+  .empty-text{font-size:13px;line-height:1.8}
+  .tool-row{display:flex;justify-content:flex-end;margin-bottom:16px}
+  .link-btn{background:none;border:none;color:#7bc0ff;font-size:12px;cursor:pointer;text-decoration:underline}
+  .toast{position:fixed;bottom:32px;left:50%;transform:translateX(-50%) translateY(20px);background:rgba(20,24,44,0.95);border:1px solid rgba(91,168,255,0.3);padding:12px 22px;border-radius:12px;font-size:13px;color:#e8efff;opacity:0;transition:all .3s;z-index:200;pointer-events:none}
+  .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+  .toast.error{border-color:rgba(239,68,68,0.4);color:#f87171}
+  .toast.success{border-color:rgba(34,197,94,0.4);color:#4ade80}
+</style>
+</head>
+<body>
+<div class="bg-fixed"></div>
+<div class="bg-overlay"></div>
+
+<div class="navbar">
+  <div class="nav-brand" onclick="goBack()">
+    <span class="nav-brand-title">← 返回</span>
+  </div>
+  <div class="nav-back" onclick="goBack()">返回主页</div>
+</div>
+
+<div class="container">
+  <div class="page-header">
+    <div class="page-icon">🔔</div>
+    <h1 class="page-title">消息中心</h1>
+    <p class="page-desc">管理员的回复、系统通知都在这里</p>
+  </div>
+
+  <div class="tabs">
+    <div class="tab active" id="tabAll" onclick="switchFilter('all')">全部消息</div>
+    <div class="tab" id="tabUnread" onclick="switchFilter('unread')">未读</div>
+  </div>
+
+  <div class="tool-row">
+    <button class="link-btn" onclick="markAllRead()">全部标为已读</button>
+  </div>
+
+  <div class="msg-list" id="msgList">
+    <div class="empty-state"><div class="empty-icon">⏳</div><div class="empty-text">加载中...</div></div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+var SUPABASE_URL = "https://ekfntkpjqzmkibdimtru.supabase.co";
+var ANON_KEY = "sb_publishable_Z3wpxD9ZRbXm9-gPPQOGZg_KKhr_yIs";
+var currentUser = null;
+var msgFilter = "all";
+var allMessages = [];
+
+window.addEventListener('DOMContentLoaded', function(){
+  var ok = false;
+  var hasSession = localStorage.getItem('sb_session') || localStorage.getItem('sb_admin') || sessionStorage.getItem('sb_session') || sessionStorage.getItem('sb_admin');
+  if(sessionStorage.getItem('logged_in') && hasSession) ok = true;
+  else if(localStorage.getItem('logged_in') && hasSession){
+    var exp = parseInt(localStorage.getItem('login_expire')||'0');
+    if(Date.now() < exp){ ok = true; sessionStorage.setItem('logged_in','1'); }
+  }
+  if(!ok){ location.href = XAUTH.LOGIN_PAGE; return; }
+
+  try{
+    var xuser = (window.XAUTH && typeof window.XAUTH.getUser === 'function') ? window.XAUTH.getUser() : null;
+    var sess = JSON.parse(localStorage.getItem('sb_session') || sessionStorage.getItem('sb_session') || 'null');
+    var adm = JSON.parse(localStorage.getItem('sb_admin') || sessionStorage.getItem('sb_admin') || 'null');
+    currentUser = xuser || sess || adm;
+  }catch(e){}
+
+  if(!currentUser || !currentUser.uid){
+    document.getElementById('msgList').innerHTML = '<div class="empty-state"><div class="empty-icon">🔐</div><div class="empty-text">请先登录后查看消息</div></div>';
+    return;
+  }
+  loadMessages();
+});
+
+function switchFilter(f){
+  msgFilter = f;
+  document.getElementById('tabAll').classList.toggle('active', f === 'all');
+  document.getElementById('tabUnread').classList.toggle('active', f === 'unread');
+  renderMessages();
+}
+
+function loadMessages(){
+  var list = document.getElementById('msgList');
+  list.innerHTML = '<div class="empty-state"><div class="empty-icon">⏳</div><div class="empty-text">加载中...</div></div>';
+  fetch(SUPABASE_URL + '/rest/v1/user_messages?select=*&user_id=eq.' + currentUser.uid + '&order=created_at.desc', {
+    headers: {'apikey': ANON_KEY, 'Authorization': 'Bearer ' + (currentUser.token || ANON_KEY)}
+  })
+  .then(function(r){
+    if(r.status === 404){ throw {notTable: true}; }
+    return r.json();
+  })
+  .then(function(data){
+    allMessages = Array.isArray(data) ? data : [];
+    renderMessages();
+  })
+  .catch(function(err){
+    if(err && err.notTable){
+      list.innerHTML = '<div class="empty-state"><div class="empty-icon">🛠️</div><div class="empty-text">消息功能尚未初始化<br>请联系管理员在数据库中创建消息表</div></div>';
+    }else{
+      list.innerHTML = '<div class="empty-state"><div class="empty-icon">❌</div><div class="empty-text">加载失败，请刷新重试</div></div>';
+    }
+  });
+}
+
+function renderMessages(){
+  var list = document.getElementById('msgList');
+  var data = msgFilter === 'unread' ? allMessages.filter(function(m){ return !m.is_read; }) : allMessages;
+  if(data.length === 0){
+    list.innerHTML = '<div class="empty-state"><div class="empty-icon">📭</div><div class="empty-text">' + (msgFilter === 'unread' ? '没有未读消息' : '暂无消息') + '</div></div>';
+    return;
+  }
+  list.innerHTML = data.map(function(m){ return renderItem(m); }).join('');
+}
+
+function renderItem(m){
+  var unread = !m.is_read;
+  var isAdmin = m.msg_type === 'admin';
+  var icon = isAdmin ? '💬' : '🔔';
+  var badge = isAdmin ? '<span class="msg-badge badge-admin">管理员</span>' : '<span class="msg-badge badge-system">系统</span>';
+  var time = fmtTime(m.created_at);
+  var actions = '';
+  if(isAdmin && m.ticket_id){
+    actions = '<div class="msg-actions"><button class="btn-sm btn-chat" onclick="openConversation(' + m.ticket_id + ')">💬 进入对话</button></div>';
+  }
+  return '<div class="msg-item' + (unread ? ' unread' : '') + '" onclick="onItemClick(' + m.id + ')">' +
+    '<div class="msg-head">' +
+      '<div class="msg-meta">' +
+        '<span class="msg-icon">' + icon + '</span>' +
+        '<span class="msg-title">' + escapeHtml(m.title || (isAdmin ? '管理员消息' : '系统通知')) + '</span>' +
+        badge +
+      '</div>' +
+      (unread ? '<span class="dot"></span>' : '') +
+    '</div>' +
+    '<div class="msg-content">' + escapeHtml(m.content || '') + '</div>' +
+    '<div class="msg-time">' + time + '</div>' +
+    actions +
+  '</div>';
+}
+
+function onItemClick(id){
+  var m = allMessages.find(function(x){ return x.id === id; });
+  if(m && !m.is_read) markRead(id);
+}
+
+function markRead(id){
+  fetch(SUPABASE_URL + '/rest/v1/user_messages?id=eq.' + id, {
+    method: 'PATCH',
+    headers: {'apikey': ANON_KEY, 'Authorization': 'Bearer ' + (currentUser.token || ANON_KEY), 'Content-Type': 'application/json', 'Prefer': 'return=minimal'},
+    body: JSON.stringify({is_read: true})
+  }).then(function(){
+    var m = allMessages.find(function(x){ return x.id === id; });
+    if(m) m.is_read = true;
+    renderMessages();
+  }).catch(function(){});
+}
+
+function markAllRead(){
+  if(!allMessages.some(function(m){ return !m.is_read; })){
+    showToast('没有未读消息', 'info');
+    return;
+  }
+  fetch(SUPABASE_URL + '/rest/v1/user_messages?user_id=eq.' + currentUser.uid + '&is_read=eq.false', {
+    method: 'PATCH',
+    headers: {'apikey': ANON_KEY, 'Authorization': 'Bearer ' + (currentUser.token || ANON_KEY), 'Content-Type': 'application/json', 'Prefer': 'return=minimal'},
+    body: JSON.stringify({is_read: true})
+  }).then(function(){
+    allMessages.forEach(function(m){ m.is_read = true; });
+    renderMessages();
+    showToast('已全部标为已读', 'success');
+  }).catch(function(){ showToast('操作失败', 'error'); });
+}
+
+function openConversation(ticketId){
+  if(!currentUser || !currentUser.token){ showToast('请先登录', 'error'); return; }
+  location.href = 'conversation.html?ticket_id=' + ticketId;
+}
+
+function goBack(){
+  var adm = null;
+  try{ adm = JSON.parse(localStorage.getItem('sb_admin') || sessionStorage.getItem('sb_admin') || 'null'); }catch(e){}
+  if(adm && adm.uid){
+    XAUTH.go('https://cqxjw-class7-2020-2.pages.dev/admin-main.html');
+  }else{
+    XAUTH.go('https://cqxjw-class7-2020-2.pages.dev/a3x7k2m9p4q8r3t6w1y5u0i2o4.html');
+  }
+}
+
+function fmtTime(s){
+  if(!s) return '未知';
+  try{ return new Date(s).toLocaleString('zh-CN'); }catch(e){ return s; }
+}
+
+function escapeHtml(str){
+  var div = document.createElement('div');
+  div.textContent = str == null ? '' : str;
+  return div.innerHTML;
+}
+
+function showToast(msg, type){
+  var t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = 'toast ' + (type || 'info');
+  setTimeout(function(){ t.classList.add('show'); }, 10);
+  setTimeout(function(){ t.classList.remove('show'); }, 3000);
+}
+</script>
+<script src="perf.js"></script>
+</body>
+</html>

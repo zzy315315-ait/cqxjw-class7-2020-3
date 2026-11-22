@@ -214,6 +214,15 @@ function loadConversations(){
     }
     conversations = data;
     renderConversations();
+    data.forEach(function(msg){
+      if(msg.sender === 'admin' && !msg.is_read && msg.id){
+        fetch(SUPABASE_URL + '/rest/v1/conversations?id=eq.' + msg.id, {
+          method: 'PATCH',
+          headers: {'apikey': ANON_KEY, 'Authorization': 'Bearer ' + currentUser.token, 'Content-Type': 'application/json', 'Prefer': 'return=minimal'},
+          body: JSON.stringify({is_read: true})
+        }).catch(function(){});
+      }
+    });
   })
   .catch(function(err){
     console.error('加载对话失败:', err);
@@ -235,7 +244,7 @@ function renderConversations(){
     var time = new Date(msg.created_at).toLocaleString('zh-CN');
     var senderName = msg.sender === 'admin' ? '管理员' : (msg.name || '我');
     div.innerHTML = 
-      '<div class="chat-bubble">' + escapeHtml(msg.content || '') + '</div>' +
+      '<div class="chat-bubble">' + escapeHtml(msg.message || msg.content || '') + '</div>' +
       '<div class="chat-meta">' + escapeHtml(senderName) + ' · ' + time + '</div>';
     container.appendChild(div);
   });
@@ -265,7 +274,7 @@ function sendMessage(){
       ticket_id: ticketId,
       user_id: currentUser.uid,
       name: currentUser.name || '匿名',
-      content: content,
+      message: content,
       sender: isAdmin ? 'admin' : 'user',
       created_at: new Date().toISOString()
     })
