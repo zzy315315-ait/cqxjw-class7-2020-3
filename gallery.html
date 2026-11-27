@@ -2,7 +2,7 @@
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <link rel="icon" type="image/png" href='xiaohui.png'>
 <title>班级相册 - 谢家湾学校2020级7班 · 毕业记忆</title>
 <style>
@@ -33,9 +33,10 @@
   .footer b{color:#7a8ab5}
   
   /* 图片查看器 */
-  .img-viewer{position:fixed;inset:0;background:rgba(5,8,16,0.95);z-index:1000;display:none;align-items:center;justify-content:center;animation:fadeIn .3s}
+  .img-viewer{position:fixed;inset:0;width:100vw;height:100dvh;background:rgba(5,8,16,0.95);z-index:1000;display:none;align-items:center;justify-content:center;animation:fadeIn .3s;touch-action:manipulation;overscroll-behavior:contain}
   .img-viewer.show{display:flex}
-  .img-viewer-img{max-width:90%;max-height:85%;object-fit:contain;border-radius:12px;box-shadow:0 20px 60px rgba(0,0,0,0.5)}
+  .img-viewer-img{max-width:90%;max-height:88dvh;object-fit:contain;border-radius:12px;box-shadow:0 20px 60px rgba(0,0,0,0.5);touch-action:manipulation;background:#000;opacity:0;transition:opacity .25s ease}
+  .img-viewer-img.loaded{opacity:1}
   .img-viewer-close{position:absolute;top:20px;right:24px;width:44px;height:44px;border-radius:50%;background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.2);color:#fff;font-size:22px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .25s}
   .img-viewer-close:hover{background:rgba(255,80,80,0.3);border-color:rgba(255,80,80,0.5);transform:rotate(90deg)}
   .img-viewer-download{position:absolute;top:20px;right:80px;width:44px;height:44px;border-radius:50%;background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.2);color:#fff;font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .25s}
@@ -129,12 +130,21 @@ images.forEach(function(item, idx){
 });
 
 /* 图片查看器 */
+function setViewerImage(item){
+  var img = document.getElementById('imgViewerImg');
+  img.classList.remove('loaded');
+  img.onload = function(){ img.classList.add('loaded'); };
+  img.onerror = function(){
+    if(item.thumb && img.src.indexOf(item.thumb) < 0){ img.src = item.thumb; }
+    else { img.classList.add('loaded'); }
+  };
+  img.src = item.src;
+}
 function openImgViewer(idx){
   currentImgIdx = idx;
   var viewer = document.getElementById('imgViewer');
-  var img = document.getElementById('imgViewerImg');
   var caption = document.getElementById('imgViewerCaption');
-  img.src = images[idx].src;
+  setViewerImage(images[idx]);
   caption.textContent = images[idx].caption;
   viewer.classList.add('show');
   document.body.style.overflow = 'hidden';
@@ -147,7 +157,7 @@ function closeImgViewer(e){
 function navImgViewer(dir, e){
   e.stopPropagation();
   currentImgIdx = (currentImgIdx + dir + images.length) % images.length;
-  document.getElementById('imgViewerImg').src = images[currentImgIdx].src;
+  setViewerImage(images[currentImgIdx]);
   document.getElementById('imgViewerCaption').textContent = images[currentImgIdx].caption;
 }
 function downloadCurrentImg(e){

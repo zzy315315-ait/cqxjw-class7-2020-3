@@ -2,7 +2,7 @@
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <link rel="icon" type="image/png" href='xiaohui.png'>
 <title>班级墙 - 谢家湾学校2020级7班 · 毕业记忆</title>
 <style>
@@ -85,16 +85,17 @@
 
   /* Lightbox */
   .lightbox{
-    position:fixed;inset:0;z-index:1000;
+    position:fixed;inset:0;width:100vw;height:100dvh;z-index:1000;
     background:rgba(0,0,0,0.92);backdrop-filter:blur(10px);
     display:none;align-items:center;justify-content:center;
-    animation:fadeIn .3s;
+    animation:fadeIn .3s;touch-action:manipulation;overscroll-behavior:contain;
   }
   .lightbox.show{display:flex}
   @keyframes fadeIn{from{opacity:0}to{opacity:1}}
   .lightbox-img{
-    max-width:90vw;max-height:85vh;object-fit:contain;
+    max-width:90vw;max-height:88dvh;object-fit:contain;
     border-radius:12px;box-shadow:0 20px 60px rgba(0,0,0,0.5);
+    touch-action:manipulation;background:#000;
     animation:zoomIn .35s cubic-bezier(.22,1,.36,1);
   }
   @keyframes zoomIn{from{opacity:0;transform:scale(.9)}to{opacity:1;transform:scale(1)}}
@@ -230,9 +231,16 @@ images.forEach(function(fname, idx){
 });
 
 var currentIdx = 0;
+function setLightbox(fname){
+  var img = document.getElementById('lightboxImg');
+  img.onerror = function(){
+    if(img.src.indexOf('rudui-thumb/') < 0){ img.src = 'rudui-thumb/' + fname; }
+  };
+  img.src = 'rudui/' + fname;
+}
 function openLightbox(idx){
   currentIdx = idx;
-  document.getElementById('lightboxImg').src = 'rudui/' + images[idx];
+  setLightbox(images[idx]);
   document.getElementById('lightboxCounter').textContent = (idx+1) + ' / ' + images.length;
   document.getElementById('lightbox').classList.add('show');
   document.body.style.overflow = 'hidden';
@@ -245,7 +253,7 @@ function closeLightbox(e){
 function navLightbox(dir, e){
   e.stopPropagation();
   currentIdx = (currentIdx + dir + images.length) % images.length;
-  document.getElementById('lightboxImg').src = 'rudui/' + images[currentIdx];
+  setLightbox(images[currentIdx]);
   document.getElementById('lightboxCounter').textContent = (currentIdx+1) + ' / ' + images.length;
 }
 
