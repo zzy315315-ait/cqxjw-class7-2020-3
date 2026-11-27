@@ -156,16 +156,16 @@
   </div>
 </div>
 
-<!-- 编辑弹窗 -->
+<!-- 补充说明弹窗（追加留言，不修改原反馈） -->
 <div class="edit-modal" id="editModal" onclick="if(event.target===this)closeEditModal()">
   <div class="edit-modal-content">
     <button class="edit-modal-close" onclick="closeEditModal()">×</button>
-    <h3 class="edit-modal-title">编辑反馈</h3>
+    <h3 class="edit-modal-title">补充说明</h3>
     <input type="hidden" id="editTicketId">
-    <label class="form-label">详细描述</label>
-    <textarea class="form-textarea" id="editTicketMsg" placeholder="修改你的反馈内容..." maxlength="500"></textarea>
+    <label class="form-label">追加留言</label>
+    <textarea class="form-textarea" id="editTicketMsg" placeholder="追加一条留言补充说明，原反馈内容不会被修改..." maxlength="500"></textarea>
     <div style="text-align:right;font-size:11px;color:#5a6890;margin-top:6px"><span id="editCharCount">0</span> / 500</div>
-    <button class="btn-primary" onclick="saveEditTicket()" style="margin-top:16px">保存修改</button>
+    <button class="btn-primary" id="appendBtn" onclick="saveAppendTicket()" style="margin-top:16px">追加留言</button>
   </div>
 </div>
 
@@ -321,15 +321,13 @@ function submitTicket(){
     }else if(r.status === 403){
       showToast('没有权限提交反馈，请联系管理员', 'error');
     }else{
-      return r.text().then(function(e){ 
-        console.error('提交反馈错误响应:', e);
-        throw new Error(e || '提交失败'); 
-      });
+      console.error('提交反馈错误响应:', r.status);
+      showToast('提交失败，请稍后重试；若仍异常请联系管理员', 'error');
     }
   })
   .catch(function(err){
     console.error('提交反馈异常:', err);
-    showToast('提交失败：' + err.message, 'error');
+    showToast('网络异常，反馈未提交，请稍后重试', 'error');
   })
   .finally(function(){
     btn.disabled = false;
@@ -413,19 +411,20 @@ function renderTicket(t, isAdminView){
 
   // 只有管理员或反馈所有者才能看到编辑和删除按钮
   var isOwner = currentUser && t.user_id && t.user_id !== 'None' && t.user_id !== 'null' && currentUser.uid === t.user_id;
-  var editBtn = '';
+  var appendBtn = '';
   var deleteBtn = '';
   if(isOwner || isAdmin){
     deleteBtn = '<button class="btn-sm" onclick="deleteTicket(' + t.id + ')" style="background:rgba(239,68,68,0.2);border:1px solid rgba(239,68,68,0.3);color:#f87171;margin-left:8px;padding:4px 10px;border-radius:6px;cursor:pointer;font-size:12px">删除</button>';
   }
   
-  // 只有被管理员回复后，才能进入对话界面
+  // 本人或管理员可进入对话查看/追加留言
   var chatBtn = '';
-  if(t.admin_reply && t.admin_reply.trim() !== '' && (isOwner || isAdmin)){
-    chatBtn = '<button class="btn-sm" onclick="enterConversation(' + t.id + ')" style="background:rgba(91,168,255,0.2);border:1px solid rgba(91,168,255,0.3);color:#7bc0ff;margin-left:8px;padding:4px 10px;border-radius:6px;cursor:pointer;font-size:12px">💬 进入对话</button>';
+  if(isOwner || isAdmin){
+    chatBtn = '<button class="btn-sm" onclick="enterConversation(' + t.id + ')" style="background:rgba(91,168,255,0.2);border:1px solid rgba(91,168,255,0.3);color:#7bc0ff;margin-left:8px;padding:4px 10px;border-radius:6px;cursor:pointer;font-size:12px">💬 对话/追加</button>';
   }
+  // 本人可在原反馈下追加一条留言，原反馈内容不可修改
   if(isOwner && t.status !== 'processed'){
-    editBtn = '<button class="btn-sm btn-edit" onclick="editTicket(' + t.id + ', \'' + escapeHtml(t.message || '').replace(/'/g, "\\'") + '\')">编辑</button>';
+    appendBtn = '<button class="btn-sm btn-edit" onclick="openAppendModal(' + t.id + ')">➕ 补充说明</button>';
   }
 
   return '<div class="ticket-item">' +
@@ -439,7 +438,7 @@ function renderTicket(t, isAdminView){
     '<div class="ticket-msg">' + escapeHtml(t.message) + '</div>' +
     replyHtml +
     adminActions +
-    editBtn + deleteBtn + chatBtn +
+    appendBtn + deleteBtn + chatBtn +
     '<div class="ticket-time">' + time + '</div>' +
   '</div>';
 }
@@ -565,54 +564,64 @@ function goBack(){
   }
 }
 
-/* 编辑反馈 */
-function editTicket(id, message){
-  if(!currentUser){
-    showToast('请先登录', 'error');
-    return;
-  }
-  document.getElementById('editTicketId').value = id;
-  document.getElementById('editTicketMsg').value = message;
-  document.getElementById('editCharCount').textContent = message.length;
-  document.getElementById('editModal').style.display = 'flex';
-}
-
-/* 关闭编辑弹窗 */
-function closeEditModal(){
-  document.getElementById('editModal').style.display = 'none';
-}
-
-/* 保存编辑后的反馈 */
-function saveEditTicket(){
-  var id = document.getElementById('editTicketId').value;
-  var message = document.getElementById('editTicketMsg').value.trim();
-  if(!message){
-    showToast('反馈内容不能为空', 'error');
-    return;
-  }
+/* 打开补充说明弹窗（追加留言，不改原反馈） */
+function openAppendModal(id){
   if(!currentUser || !currentUser.token){
     showToast('请先登录', 'error');
     return;
   }
-  
-  fetch(SUPABASE_URL + '/rest/v1/support_tickets?id=eq.' + id, {
-    method: 'PATCH',
+  document.getElementById('editTicketId').value = id;
+  document.getElementById('editTicketMsg').value = '';
+  document.getElementById('editCharCount').textContent = '0';
+  document.getElementById('editModal').style.display = 'flex';
+}
+
+/* 关闭弹窗 */
+function closeEditModal(){
+  document.getElementById('editModal').style.display = 'none';
+}
+
+/* 追加一条留言到对话（原反馈记录不做任何修改） */
+function saveAppendTicket(){
+  var id = document.getElementById('editTicketId').value;
+  var message = document.getElementById('editTicketMsg').value.trim();
+  var btn = document.getElementById('appendBtn');
+  if(!message){
+    showToast('留言内容不能为空', 'error');
+    return;
+  }
+  if(!currentUser || !currentUser.uid || !currentUser.token){
+    showToast('请先登录后再追加', 'error');
+    return;
+  }
+
+  if(btn){ btn.disabled = true; btn.textContent = '追加中...'; }
+
+  var body = {
+    ticket_id: id,
+    user_id: currentUser.uid,
+    name: currentUser.name || '匿名',
+    message: message,
+    sender: 'user',
+    created_at: new Date().toISOString()
+  };
+  if(currentUser.student_id) body.student_id = currentUser.student_id;
+
+  fetch(SUPABASE_URL + '/rest/v1/conversations', {
+    method: 'POST',
     headers: {
       'apikey': ANON_KEY,
       'Authorization': 'Bearer ' + currentUser.token,
       'Content-Type': 'application/json',
       'Prefer': 'return=minimal'
     },
-    body: JSON.stringify({
-      message: message,
-      updated_at: new Date().toISOString()
-    })
+    body: JSON.stringify(body)
   })
   .then(function(r){
-    if(r.ok || r.status === 200 || r.status === 204 || r.status === 404){
-      showToast('反馈修改成功', 'success');
+    if(r.ok || r.status === 201 || r.status === 204){
+      showToast('✅ 留言已追加，可在对话中查看', 'success');
       closeEditModal();
-      setTimeout(function(){ 
+      setTimeout(function(){
         if(isAdmin) loadAllTickets();
         else loadMyTickets();
       }, 500);
@@ -620,13 +629,16 @@ function saveEditTicket(){
       showToast('登录已过期，请重新登录', 'error');
       setTimeout(function(){ location.href = XAUTH.LOGIN_PAGE; }, 1500);
     }else if(r.status === 403){
-      showToast('没有权限修改这条反馈', 'error');
+      showToast('没有权限追加这条留言，请核对登录身份', 'error');
     }else{
-      return r.text().then(function(e){ throw new Error(e || '修改失败'); });
+      showToast('提交失败，请稍后重试；若仍异常请联系管理员', 'error');
     }
   })
-  .catch(function(err){
-    showToast('修改失败：' + err.message, 'error');
+  .catch(function(){
+    showToast('网络异常，留言未提交，请稍后重试', 'error');
+  })
+  .finally(function(){
+    if(btn){ btn.disabled = false; btn.textContent = '追加留言'; }
   });
 }
 

@@ -298,7 +298,7 @@
       showToast('请先登录', 'error');
       return;
     }
-    var student = allStudents.find(function(s) { return s.id === id; });
+    var student = allStudents.find(function(s) { return String(s.id) === String(id); });
     var canEdit = false;
     if(student && currentUser.uid && student.user_id){
       canEdit = currentUser.uid.toLowerCase() === student.user_id.toLowerCase();
